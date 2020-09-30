@@ -1,6 +1,9 @@
 import { URLSearchParams } from 'url'
 
 import fetch from 'node-fetch'
+import { assert, array, number, object, Struct, validate } from 'superstruct'
+
+import { WallPost } from './structs'
 
 export enum WallPostsFilter {
 	/** записи владельца стены */
@@ -9,33 +12,6 @@ export enum WallPostsFilter {
 	Others = 'others',
 	/** все записи на стене */
 	All = 'all',
-}
-
-type PhotoSize = {
-	height: number
-	url: string
-	type: 'l' | 'm' | 'p' | 's' | 'x'
-	width: number
-}
-
-type PostAttachment = {
-	type: 'link'
-	link: {
-		url: string
-		title: string
-		caption: string
-		description: string
-		photo: {
-			album_id: number
-			date: number
-			id: number
-			owner_id: number
-			has_tags: boolean
-			sizes: PhotoSize[]
-			text: string
-			user_id: number
-		}
-	}
 }
 
 class VKClient {
@@ -47,10 +23,11 @@ class VKClient {
 		this.apiVersion = 5.124
 	}
 
-	private async callMethod<TData extends unknown[] | Record<string, unknown>>(
-		methodName: string,
+	private async callMethod<T>(
+		name: string,
 		params: Record<string, string | number>,
-	): Promise<TData> {
+		struct: Struct<T>,
+	): Promise<T> {
 		const searchParams = new URLSearchParams()
 
 		for (const [key, value] of Object.entries(params)) {
@@ -60,9 +37,7 @@ class VKClient {
 		searchParams.append('access_token', this.token)
 		searchParams.append('v', String(this.apiVersion))
 
-		const response = await fetch(
-			`https://api.vk.com/method/${methodName}?${searchParams}`,
-		)
+		const response = await fetch(`https://api.vk.com/method/${name}?${searchParams}`)
 
 		if (!response.ok) {
 			throw new Error(`Request failed: ${response.url}: ${response.status}`)
@@ -74,6 +49,8 @@ class VKClient {
 		if ('error' in json) {
 			throw new Error(`Request failed: ${response.url}: ${json.error.error_msg}`)
 		}
+
+		assert(json.response, struct)
 
 		return json.response
 	}
@@ -89,20 +66,17 @@ class VKClient {
 		/** определяет, какие типы записей на стене необходимо получить */
 		filter?: WallPostsFilter
 	}) {
-		const result = await this.callMethod<{
-			count: number
-			items: {
-				id: number
-				from_id: number
-				owner_id: number
-				date: number
-				post_type: string
-				text: string
-				attachments: PostAttachment[]
-				comments: { count: number }
-				likes: { count: number }
-			}[]
-		}>('wall.get', { owner_id: ownerId, count: count, filter })
+		const WallPosts = object({ count: number(), items: array(WallPost) })
+
+		const result = await this.callMethod(
+			'wall.get',
+			{
+				owner_id: ownerId,
+				count: count,
+				filter,
+			},
+			WallPosts,
+		)
 
 		return result
 	}
