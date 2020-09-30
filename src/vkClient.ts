@@ -1,14 +1,9 @@
 import { URLSearchParams } from 'url'
 
 import fetch from 'node-fetch'
-import { assert, array, number, type, StructType } from 'superstruct'
+import { assert, array, number, type, string } from 'superstruct'
 
 import { WallPost } from './structs'
-import assertNever from './utils/assertNever'
-
-const responseTypes = {
-	'wall.get': type({ count: number(), items: array(WallPost) }),
-}
 
 class VKClient {
 	private apiVersion: number
@@ -19,20 +14,8 @@ class VKClient {
 		this.apiVersion = 5.124
 	}
 
-	/** Возвращает список записей со стены пользователя или сообщества */
-	async callMethod(
-		name: 'wall.get',
-		params: {
-			owner_id: number
-			count: number
-			/** определяет, какие типы записей на стене необходимо получить */
-			filter?: 'owner' | 'others' | 'all'
-			offset?: number
-		},
-	): Promise<StructType<typeof responseTypes['wall.get']>>
-
-	async callMethod(
-		name: 'wall.get',
+	private async callMethod(
+		name: string,
 		params: Record<string, string | number | undefined>,
 	): Promise<Record<string, unknown> | unknown[]> {
 		const searchParams = new URLSearchParams()
@@ -52,20 +35,41 @@ class VKClient {
 			throw new Error(`Request failed: ${response.url}: ${response.status}`)
 		}
 
-		const { response: data, error } = await response.json()
-		// console.log(JSON.stringify(error || data, null, '  '))
+		const json = await response.json()
 
-		if (error) {
-			throw new Error(`Request failed: ${response.url}: ${error.error_msg}`)
+		if ('error' in json) {
+			throw new Error(`Request failed: ${response.url}: ${json.error.error_msg}`)
 		}
 
-		switch (name) {
-			case 'wall.get':
-				assert(data, responseTypes['wall.get'])
-				return data
-			default:
-				return assertNever(name)
-		}
+		return json.response
+	}
+
+	/** Возвращает список записей со стены пользователя или сообщества */
+	async getWall(params: {
+		owner_id: number
+		count: number
+		/** определяет, какие типы записей на стене необходимо получить */
+		filter?: 'owner' | 'others' | 'all'
+		offset?: number
+	}) {
+		const WallPosts = type({ count: number(), items: array(WallPost) })
+
+		const data = await this.callMethod('wall.get', params)
+
+		assert(data, WallPosts)
+
+		return data
+	}
+
+	/** Возвращает информацию о заданном сообществе */
+	async getGroupById(params: { group_id: string }) {
+		const GroupInfos = array(type({ id: number(), name: string() }))
+
+		const data = await this.callMethod('groups.getById', params)
+
+		assert(data, GroupInfos)
+
+		return data
 	}
 }
 
