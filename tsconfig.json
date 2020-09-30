@@ -12,7 +12,6 @@
 		"moduleResolution": "node",
 		"resolveJsonModule": true,
 		"isolatedModules": true,
-		"noUnusedLocals": true,
 		"outDir": "build"
 	},
 	"include": ["src"]
