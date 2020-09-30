@@ -1,0 +1,33 @@
+{
+	"name": "vk-news-telegram",
+	"version": "0.1.0",
+	"description": "Read your VK news in Telegram",
+	"main": "index.js",
+	"engines": {
+		"node": "12.x"
+	},
+	"scripts": {
+		"build": "tsc",
+		"postinstall": "npm run build",
+		"start": "node build/index.js",
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"keywords": [],
+	"author": "Alex Kondratyuk",
+	"license": "ISC",
+	"dependencies": {
+		"date-fns": "^2.16.1",
+		"dotenv-safe": "^8.2.0",
+		"ms": "^2.1.2",
+		"node-fetch": "^2.6.1",
+		"telegraf": "^3.38.0"
+	},
+	"devDependencies": {
+		"@types/ms": "^0.7.31",
+		"@types/node-fetch": "^2.5.7",
+		"@typescript-eslint/eslint-plugin": "^4.3.0",
+		"@typescript-eslint/parser": "^4.3.0",
+		"eslint": "^7.10.0",
+		"typescript": "^4.0.3"
+	}
+}
