@@ -1,6 +1,8 @@
 import { URLSearchParams } from 'url'
 
+import ms from 'ms'
 import fetch from 'node-fetch'
+import PQueue from 'p-queue'
 import { assert, array, number, type, string } from 'superstruct'
 
 import { WallPost } from './structs'
@@ -8,10 +10,18 @@ import { WallPost } from './structs'
 class VKClient {
 	private apiVersion: number
 	private token: string
+	private queue: PQueue
 
 	constructor({ token }: { token: string }) {
 		this.token = token
 		this.apiVersion = 5.124
+		this.queue = new PQueue({
+			intervalCap: 1,
+			// На самом деле ограничение ВК -- 3 запроса в секунду
+			// (https://vk.com/dev/api_requests), но перестрахуемся
+			// и будем совершать запросы не чаще 1 в секунду
+			interval: ms('1s'),
+		})
 	}
 
 	private async callMethod(
@@ -29,7 +39,9 @@ class VKClient {
 		searchParams.append('access_token', this.token)
 		searchParams.append('v', String(this.apiVersion))
 
-		const response = await fetch(`https://api.vk.com/method/${name}?${searchParams}`)
+		const response = await this.queue.add(() =>
+			fetch(`https://api.vk.com/method/${name}?${searchParams}`),
+		)
 
 		if (!response.ok) {
 			throw new Error(`Request failed: ${response.url}: ${response.status}`)
