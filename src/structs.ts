@@ -10,11 +10,18 @@ import {
 	optional,
 } from 'superstruct'
 
-const Image = type({
-	height: number(),
-	url: string(),
-	width: number(),
-})
+const Image = union([
+	type({
+		height: number(),
+		url: string(),
+		width: number(),
+	}),
+	type({
+		height: number(),
+		src: string(),
+		width: number(),
+	}),
+])
 
 const LinkAttachment = type({
 	type: literal('link'),
@@ -75,7 +82,6 @@ const VideoAttachment = type({
 const PollAttachment = type({
 	type: literal('poll'),
 	poll: type({
-		anonymous: boolean(),
 		multiple: boolean(),
 		end_date: number(),
 		closed: boolean(),
@@ -93,11 +99,37 @@ const PollAttachment = type({
 				votes: number(),
 			}),
 		),
-		author_id: number(),
+	}),
+})
+
+const DocAttachment = type({
+	type: literal('doc'),
+	doc: type({
+		id: number(),
+		owner_id: number(),
+		title: string(),
+		size: number(),
+		ext: string(),
+		date: number(),
+		type: number(),
+		url: string(),
+		preview: type({
+			photo: type({
+				sizes: array(Image),
+			}),
+			video: type({
+				src: string(),
+				width: number(),
+				height: number(),
+				file_size: number(),
+			}),
+		}),
+		access_key: string(),
 	}),
 })
 
 const Attachment = union([
+	DocAttachment,
 	LinkAttachment,
 	PhotoAttachment,
 	PollAttachment,
@@ -109,6 +141,7 @@ export const WallPost = type({
 	from_id: number(),
 	owner_id: number(),
 	date: number(),
+	marked_as_ads: number(),
 	post_type: string(),
 	text: string(),
 	attachments: optional(array(Attachment)),
