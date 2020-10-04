@@ -175,7 +175,7 @@ export const VideoAttachment = type({
 	video: type({
 		access_key: string(),
 		date: number(),
-		description: string(),
+		description: optional(string()),
 		duration: number(),
 		image: array(Image),
 		first_frame: optional(array(Image)),

@@ -3,11 +3,17 @@ import { URLSearchParams } from 'url'
 import ms from 'ms'
 import fetch from 'node-fetch'
 import PQueue from 'p-queue'
-import { assert, array, number, type, string, StructType } from 'superstruct'
+import { assert, array, number, type, string, StructType, optional } from 'superstruct'
 
 import { WallPost } from './structs'
 
-const GroupInfos = array(type({ id: number(), name: string() }))
+const GroupInfos = array(
+	type({
+		id: number(),
+		name: string(),
+		screen_name: optional(string()),
+	}),
+)
 const WallPosts = type({ count: number(), items: array(WallPost) })
 
 export class VKClient {
