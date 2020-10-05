@@ -85,6 +85,15 @@ export const DocAttachment = type({
 	}),
 })
 
+export const EventAttachment = type({
+	type: literal('event'),
+	event: type({
+		id: number(),
+		address: optional(string()),
+		time: number(),
+	}),
+})
+
 export const LinkAttachment = type({
 	type: literal('link'),
 	link: type({
@@ -193,6 +202,7 @@ export const Attachment = union([
 	AlbumAttachment,
 	AudioAttachment,
 	DocAttachment,
+	EventAttachment,
 	LinkAttachment,
 	MarketAttachment,
 	PhotoAttachment,

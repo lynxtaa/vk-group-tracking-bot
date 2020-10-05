@@ -11,7 +11,10 @@ import { wrapInCodeBlock } from './utils/wrapInCodeBlock'
 import { Chat, ChatModel } from './models/Chat'
 import { Group, GroupModel } from './models/Group'
 import { groupBy } from 'lodash'
-import { checkUpdates } from './utils/checkUpdates'
+import { StructType } from 'superstruct'
+import { WallPost } from './structs'
+import { parseWallPost } from './utils/parseWallPost'
+import { getNewPosts } from './utils/getNewPosts'
 
 const helpText = [
 	'Привет! Я бот отслеживания постов в группах Вконтакте.',
@@ -80,7 +83,15 @@ async function main() {
 		const { pathname } = new URL(ctx.message.text)
 		const alias = pathname.replace('/', '')
 
-		const [info] = await vkClient.getGroupById({ group_id: alias })
+		let info: { id: number; name: string }
+
+		try {
+			const infos = await vkClient.getGroupById({ group_id: alias })
+			info = infos[0]
+		} catch (err) {
+			return ctx.reply(`Группа закрытая либо не существует`)
+		}
+
 		const ownerID = 0 - info.id
 
 		const savedGroup =
@@ -122,6 +133,48 @@ async function main() {
 		}
 
 		return ctx.reply(`Группа "${savedGroup.name}" добавлена в список отслеживаемых`)
+	})
+
+	bot.command('/latest', async (ctx) => {
+		if (!ctx.chat || !ctx.message?.text) {
+			return ctx.reply('?')
+		}
+
+		const [, link] = ctx.message.text.split(' ')
+
+		const { pathname } = new URL(link)
+		const alias = pathname.replace('/', '')
+
+		let info: { id: number; name: string }
+
+		try {
+			const infos = await vkClient.getGroupById({ group_id: alias })
+			info = infos[0]
+		} catch (err) {
+			return ctx.reply(`Группа закрытая либо не существует`)
+		}
+
+		const ownerID = 0 - info.id
+
+		const posts = await vkClient.getWall({
+			owner_id: ownerID,
+			count: 5,
+			offset: 0,
+		})
+
+		const [latestPost] = posts.items.filter(
+			(post) => !post.marked_as_ads && !post.is_pinned,
+		)
+
+		if (latestPost) {
+			await sendPostToChat({
+				chatId: String(ctx.chat.id),
+				post: latestPost,
+				groupName: info.name,
+			})
+		} else {
+			await ctx.reply('Новости не найдены')
+		}
 	})
 
 	bot.command('del', async (ctx) => {
@@ -181,82 +234,125 @@ async function main() {
 	// eslint-disable-next-line no-console
 	console.log('Bot launched...')
 
-	async function check() {
-		try {
-			const chatsWithGroups = await ChatModel.find({
-				groups: { $exists: true, $ne: [] },
+	async function sendPostToChat({
+		chatId,
+		groupName,
+		post,
+	}: {
+		chatId: string
+		groupName: string
+		post: StructType<typeof WallPost>
+	}) {
+		const { text, photos, videos } = parseWallPost(groupName, post)
+
+		await bot.telegram.sendMessage(chatId, text, {
+			disable_web_page_preview: true,
+		})
+
+		if (photos.length > 0) {
+			await bot.telegram.sendMediaGroup(chatId, photos)
+		}
+
+		for (const videoLink of videos) {
+			await bot.telegram.sendMessage(chatId, videoLink)
+		}
+
+		const repost = post.copy_history?.[0]
+
+		if (repost) {
+			const [info] = await vkClient.getGroupById({
+				group_id: String(0 - repost.owner_id),
 			})
 
-			const aliveChats: Chat[] = []
+			const { text, photos, videos } = parseWallPost(info.name, repost)
 
-			for (const chat of chatsWithGroups) {
-				const isAlive = await isChatAlive(chat.chatId)
+			await bot.telegram.sendMessage(chatId, `--- REPOST ---\n\n${text}`, {
+				disable_web_page_preview: true,
+			})
 
-				if (isAlive) {
-					aliveChats.push(chat)
-				}
+			if (photos.length > 0) {
+				await bot.telegram.sendMediaGroup(chatId, photos)
 			}
 
-			const byGroupId = groupBy(
-				aliveChats.flatMap((chat) => chat.groups.map((groupId) => ({ chat, groupId }))),
-				(el) => el.groupId,
-			)
-
-			const groups = await GroupModel.find().where('_id').in(Object.keys(byGroupId))
-
-			const checkResults = await checkUpdates(groups)
-
-			for (const result of checkResults) {
-				if ('error' in result) {
-					// eslint-disable-next-line no-console
-					console.error(`Error in ${result.groupId}: ${result.error}`)
-					continue
-				}
-
-				const chats = byGroupId[result.groupId]
-				const { text, photos, videos, repost } = result.post
-
-				for (const chat of chats) {
-					await bot.telegram.sendMessage(chat.chat.chatId, text, {
-						disable_web_page_preview: true,
-					})
-
-					if (photos.length > 0) {
-						await bot.telegram.sendMediaGroup(chat.chat.chatId, photos)
-					}
-
-					for (const videoLink of videos) {
-						await bot.telegram.sendMessage(chat.chat.chatId, videoLink)
-					}
-
-					if (repost) {
-						const { text, photos, videos } = repost
-
-						await bot.telegram.sendMessage(
-							chat.chat.chatId,
-							`--- REPOST ---\n\n${text}`,
-							{ disable_web_page_preview: true },
-						)
-
-						if (photos.length > 0) {
-							await bot.telegram.sendMediaGroup(chat.chat.chatId, photos)
-						}
-
-						for (const videoLink of videos) {
-							await bot.telegram.sendMessage(chat.chat.chatId, videoLink)
-						}
-					}
-				}
+			for (const videoLink of videos) {
+				await bot.telegram.sendMessage(chatId, videoLink)
 			}
-		} catch (err) {
-			// eslint-disable-next-line no-console
-			console.error(err)
 		}
 	}
 
-	setInterval(check, ms(process.env.INTERVAL || '15m'))
+	async function check() {
+		const chatsWithGroups = await ChatModel.find({
+			groups: { $exists: true, $ne: [] },
+		})
 
-	check()
+		const aliveChats: Chat[] = []
+
+		for (const chat of chatsWithGroups) {
+			const isAlive = await isChatAlive(chat.chatId)
+
+			if (isAlive) {
+				aliveChats.push(chat)
+			}
+		}
+
+		const byGroupId = groupBy(
+			aliveChats.flatMap((chat) => chat.groups.map((groupId) => ({ chat, groupId }))),
+			(el) => el.groupId,
+		)
+
+		const groups = await GroupModel.find().where('_id').in(Object.keys(byGroupId))
+
+		const checkResults = await Promise.allSettled(
+			groups.map(async (group) => {
+				const newPosts = await getNewPosts(group)
+
+				if (newPosts[0]) {
+					group.lastPost = {
+						postId: newPosts[0].id,
+						checkedAt: new Date(),
+						createdAt: new Date(),
+					}
+					await group.save()
+				} else if (group.lastPost) {
+					group.lastPost.checkedAt = new Date()
+					await group.save()
+				}
+
+				return newPosts
+			}),
+		)
+
+		for (let i = 0; i < checkResults.length; i++) {
+			const result = checkResults[i]
+			const group = groups[i]
+
+			if (result.status === 'rejected') {
+				// eslint-disable-next-line no-console
+				console.error(`Error in ${group.name}: ${result.reason}`)
+				continue
+			}
+
+			for (const post of result.value) {
+				for (const { chat } of byGroupId[group._id]) {
+					try {
+						await sendPostToChat({ chatId: chat.chatId, post, groupName: group.name })
+					} catch (err) {
+						// eslint-disable-next-line no-console
+						console.error(
+							`Error in sending post ${post.id} to chat ${chat.chatId} (${err})`,
+						)
+					}
+				}
+			}
+		}
+	}
+
+	// eslint-disable-next-line no-console
+	const safeCheck = () => check().catch(console.error.bind(console))
+
+	setInterval(safeCheck, ms(process.env.INTERVAL || '15m'))
+
+	safeCheck()
 }
 
 main()
