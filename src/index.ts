@@ -8,13 +8,10 @@ import { TelegrafContext } from 'telegraf/typings/context'
 
 import { vkClient } from './vkClient'
 import { wrapInCodeBlock } from './utils/wrapInCodeBlock'
-import { Chat, ChatModel } from './models/Chat'
+import { ChatModel } from './models/Chat'
 import { Group, GroupModel } from './models/Group'
-import { groupBy } from 'lodash'
-import { StructType } from 'superstruct'
-import { WallPost } from './structs'
-import { parseWallPost } from './utils/parseWallPost'
-import { getNewPosts } from './utils/getNewPosts'
+import { sendPostToChat } from './utils/sendPostToChat'
+import { checkUpdates } from './checkUpdates'
 
 const helpText = [
 	'Привет! Я бот отслеживания постов в группах Вконтакте.',
@@ -26,13 +23,7 @@ const helpText = [
 ].join('\n')
 
 async function main() {
-	const bot = new Telegraf(process.env.BOT_TOKEN!)
-
-	const isChatAlive = (chatId: string | number): Promise<boolean> =>
-		bot.telegram
-			.sendChatAction(chatId, 'typing')
-			.then(() => true)
-			.catch(() => false)
+	const bot = new Telegraf(process.env.BOT_TOKEN)
 
 	bot.start((ctx) => ctx.reply(helpText, { disable_web_page_preview: true }))
 
@@ -167,7 +158,7 @@ async function main() {
 		)
 
 		if (latestPost) {
-			await sendPostToChat({
+			await sendPostToChat(bot, {
 				chatId: String(ctx.chat.id),
 				post: latestPost,
 				groupName: info.name,
@@ -224,7 +215,7 @@ async function main() {
 
 	await bot.launch()
 
-	await mongoose.connect(process.env.MONGODB_URI!, {
+	await mongoose.connect(process.env.MONGODB_URI, {
 		useCreateIndex: true,
 		useNewUrlParser: true,
 		useUnifiedTopology: true,
@@ -234,121 +225,8 @@ async function main() {
 	// eslint-disable-next-line no-console
 	console.log('Bot launched...')
 
-	async function sendPostToChat({
-		chatId,
-		groupName,
-		post,
-	}: {
-		chatId: string
-		groupName: string
-		post: StructType<typeof WallPost>
-	}) {
-		const { text, photos, videos } = parseWallPost(groupName, post)
-
-		await bot.telegram.sendMessage(chatId, text, {
-			disable_web_page_preview: true,
-		})
-
-		if (photos.length > 0) {
-			await bot.telegram.sendMediaGroup(chatId, photos)
-		}
-
-		for (const videoLink of videos) {
-			await bot.telegram.sendMessage(chatId, videoLink)
-		}
-
-		const repost = post.copy_history?.[0]
-
-		if (repost) {
-			const [info] = await vkClient.getGroupById({
-				group_id: String(0 - repost.owner_id),
-			})
-
-			const { text, photos, videos } = parseWallPost(info.name, repost)
-
-			await bot.telegram.sendMessage(chatId, `--- REPOST ---\n\n${text}`, {
-				disable_web_page_preview: true,
-			})
-
-			if (photos.length > 0) {
-				await bot.telegram.sendMediaGroup(chatId, photos)
-			}
-
-			for (const videoLink of videos) {
-				await bot.telegram.sendMessage(chatId, videoLink)
-			}
-		}
-	}
-
-	async function check() {
-		const chatsWithGroups = await ChatModel.find({
-			groups: { $exists: true, $ne: [] },
-		})
-
-		const aliveChats: Chat[] = []
-
-		for (const chat of chatsWithGroups) {
-			const isAlive = await isChatAlive(chat.chatId)
-
-			if (isAlive) {
-				aliveChats.push(chat)
-			}
-		}
-
-		const byGroupId = groupBy(
-			aliveChats.flatMap((chat) => chat.groups.map((groupId) => ({ chat, groupId }))),
-			(el) => el.groupId,
-		)
-
-		const groups = await GroupModel.find().where('_id').in(Object.keys(byGroupId))
-
-		const checkResults = await Promise.allSettled(
-			groups.map(async (group) => {
-				const newPosts = await getNewPosts(group)
-
-				if (newPosts[0]) {
-					group.lastPost = {
-						postId: newPosts[0].id,
-						checkedAt: new Date(),
-						createdAt: new Date(),
-					}
-					await group.save()
-				} else if (group.lastPost) {
-					group.lastPost.checkedAt = new Date()
-					await group.save()
-				}
-
-				return newPosts
-			}),
-		)
-
-		for (let i = 0; i < checkResults.length; i++) {
-			const result = checkResults[i]
-			const group = groups[i]
-
-			if (result.status === 'rejected') {
-				// eslint-disable-next-line no-console
-				console.error(`Error in ${group.name}: ${result.reason}`)
-				continue
-			}
-
-			for (const post of result.value) {
-				for (const { chat } of byGroupId[group._id]) {
-					try {
-						await sendPostToChat({ chatId: chat.chatId, post, groupName: group.name })
-					} catch (err) {
-						// eslint-disable-next-line no-console
-						console.error(
-							`Error in sending post ${post.id} to chat ${chat.chatId} (${err})`,
-						)
-					}
-				}
-			}
-		}
-	}
-
 	// eslint-disable-next-line no-console
-	const safeCheck = () => check().catch(console.error.bind(console))
+	const safeCheck = () => checkUpdates(bot).catch(console.error.bind(console))
 
 	setInterval(safeCheck, ms(process.env.INTERVAL || '15m'))
 

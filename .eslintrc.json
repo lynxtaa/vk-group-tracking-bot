@@ -16,7 +16,6 @@
 			"warn",
 			{ "allowArgumentsExplicitlyTypedAsAny": true }
 		],
-		"@typescript-eslint/no-extra-semi": "off",
-		"@typescript-eslint/no-non-null-assertion": "off"
+		"@typescript-eslint/no-extra-semi": "off"
 	}
 }

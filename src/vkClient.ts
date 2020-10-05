@@ -104,4 +104,4 @@ export class VKClient {
 	}
 }
 
-export const vkClient = new VKClient({ token: process.env.VK_SERVICE_TOKEN! })
+export const vkClient = new VKClient({ token: process.env.VK_SERVICE_TOKEN })
