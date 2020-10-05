@@ -53,7 +53,11 @@ export async function parseWallPost(
 			const biggestPhoto = getBiggestImage(attach.link.photo.sizes)
 
 			if (biggestPhoto) {
-				data.photos.push({ type: 'photo', media: biggestPhoto.url })
+				data.photos.push({
+					type: 'photo',
+					media: biggestPhoto.url,
+					caption: `${attach.link.title} (${attach.link.url})`,
+				})
 			}
 		} else if (attach.type === 'video') {
 			data.videos.push(`https://vk.com/video${attach.video.owner_id}_${attach.video.id}`)
