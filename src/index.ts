@@ -13,6 +13,15 @@ import { Group, GroupModel } from './models/Group'
 import { groupBy } from 'lodash'
 import { checkUpdates } from './utils/checkUpdates'
 
+const helpText = [
+	'Привет! Я бот отслеживания постов в группах Вконтакте.',
+	'Просто пиши мне ссылки на группы, я начну их отслеживать и публиковать сюда обновления.',
+	'Получается не всегда хорошо, но я очень стараюсь.\n',
+	'Доступные команды:',
+	'/list - список отслеживаемых групп',
+	'/del http://vk.com/group123 - удалить группу из отслеживаемых',
+].join('\n')
+
 async function main() {
 	const bot = new Telegraf(process.env.BOT_TOKEN!)
 
@@ -22,7 +31,7 @@ async function main() {
 			.then(() => true)
 			.catch(() => false)
 
-	bot.start((ctx) => ctx.reply('Привет!'))
+	bot.start((ctx) => ctx.reply(helpText, { disable_web_page_preview: true }))
 
 	bot.catch((err: Error, ctx: TelegrafContext) => {
 		// eslint-disable-next-line no-console
@@ -34,6 +43,8 @@ async function main() {
 
 		return ctx.replyWithMarkdown(wrapInCodeBlock(err.stack || err.message))
 	})
+
+	bot.help((ctx) => ctx.reply(helpText, { disable_web_page_preview: true }))
 
 	bot.command('list', async (ctx) => {
 		if (!ctx.chat) {
