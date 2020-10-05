@@ -1,4 +1,6 @@
 import { groupBy } from 'lodash'
+import ms from 'ms'
+import PQueue from 'p-queue'
 import Telegraf from 'telegraf'
 import { TelegrafContext } from 'telegraf/typings/context'
 import { ChatModel, Chat } from './models/Chat'
@@ -9,6 +11,9 @@ import { sendPostToChat } from './utils/sendPostToChat'
 export async function checkUpdates<T extends TelegrafContext>(
 	bot: Telegraf<T>,
 ): Promise<void> {
+	// https://core.telegram.org/bots/faq#my-bot-is-hitting-limits-how-do-i-avoid-this
+	const queue = new PQueue({ interval: ms('1s'), intervalCap: 3 })
+
 	const isChatAlive = (chatId: string | number): Promise<boolean> =>
 		bot.telegram
 			.sendChatAction(chatId, 'typing')
@@ -69,7 +74,9 @@ export async function checkUpdates<T extends TelegrafContext>(
 		for (const post of result.value) {
 			for (const { chat } of byGroupId[group._id]) {
 				try {
-					await sendPostToChat(bot, { chatId: chat.chatId, post, groupName: group.name })
+					await queue.add(() =>
+						sendPostToChat(bot, { chatId: chat.chatId, post, groupName: group.name }),
+					)
 				} catch (err) {
 					// eslint-disable-next-line no-console
 					console.error(
