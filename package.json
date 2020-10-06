@@ -1,6 +1,6 @@
 {
 	"name": "vk-group-tracking-bot",
-	"version": "0.1.1",
+	"version": "0.1.2",
 	"description": "Read your VK news in Telegram",
 	"main": "index.js",
 	"engines": {
