@@ -107,8 +107,9 @@ async function main() {
 				return ctx.reply(`Группа "${savedGroup.name}" уже отслеживается`)
 			}
 
-			if (savedChat.groups.length >= 100) {
-				return ctx.reply('Увы, нельзя отслеживать более 100 групп')
+			const MAX_TRACKING_GROUPS = 20
+			if (savedChat.groups.length >= MAX_TRACKING_GROUPS) {
+				return ctx.reply(`Увы, нельзя отслеживать более ${MAX_TRACKING_GROUPS} групп`)
 			}
 
 			savedChat.groups = [...savedChat.groups, savedGroup._id]
