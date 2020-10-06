@@ -1,7 +1,9 @@
 import { StructType } from 'superstruct'
+
 import { Group } from '../models/Group'
-import { WallPost } from '../structs'
 import { vkClient } from '../vkClient'
+
+import { WallPost } from './structs'
 
 /** Возвращает новые посты в группе */
 export async function getNewPosts(group: Group): Promise<StructType<typeof WallPost>[]> {

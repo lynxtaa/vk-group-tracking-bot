@@ -5,7 +5,7 @@ import fetch from 'node-fetch'
 import PQueue from 'p-queue'
 import { assert, array, number, type, string, StructType, optional } from 'superstruct'
 
-import { WallPost } from './structs'
+import { WallPost } from './utils/structs'
 
 const GroupInfos = array(
 	type({

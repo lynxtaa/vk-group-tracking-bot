@@ -1,19 +1,14 @@
 import { groupBy } from 'lodash'
 import { TelegrafContext } from 'telegraf/typings/context'
+
+import { Bot } from './Bot'
 import { ChatModel, Chat } from './models/Chat'
 import { GroupModel } from './models/Group'
-import { BotWithCache } from './utils/BotWithCache'
 import { getNewPosts } from './utils/getNewPosts'
 
 export async function checkUpdates<T extends TelegrafContext>(
-	bot: BotWithCache<T>,
+	bot: Bot<T>,
 ): Promise<void> {
-	const isChatAlive = (chatId: string | number): Promise<boolean> =>
-		bot.telegram
-			.sendChatAction(chatId, 'typing')
-			.then(() => true)
-			.catch(() => false)
-
 	const chatsWithGroups = await ChatModel.find({
 		groups: { $exists: true, $ne: [] },
 	})
@@ -21,7 +16,7 @@ export async function checkUpdates<T extends TelegrafContext>(
 	const aliveChats: Chat[] = []
 
 	for (const chat of chatsWithGroups) {
-		const isAlive = await isChatAlive(chat.chatId)
+		const isAlive = await bot.isChatAlive(chat.chatId)
 
 		if (isAlive) {
 			aliveChats.push(chat)

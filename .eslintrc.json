@@ -1,8 +1,11 @@
 {
 	"root": true,
 	"parser": "@typescript-eslint/parser",
-	"plugins": ["@typescript-eslint"],
+	"plugins": ["@typescript-eslint", "import"],
 	"extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended"],
+	"settings": {
+		"import/extensions": [".js", ".ts"]
+	},
 	"env": {
 		"es6": true,
 		"jest": true
@@ -10,6 +13,15 @@
 	"rules": {
 		"no-mixed-spaces-and-tabs": "off",
 		"no-console": "warn",
+		"import/no-cycle": "error",
+		"import/no-useless-path-segments": "warn",
+		"import/no-unused-modules": "warn",
+		"import/first": "warn",
+		"import/order": [
+			"warn",
+			{ "alphabetize": { "order": "asc" }, "newlines-between": "always" }
+		],
+		"import/newline-after-import": "warn",
 		"@typescript-eslint/no-explicit-any": "off",
 		"@typescript-eslint/prefer-optional-chain": "warn",
 		"@typescript-eslint/explicit-module-boundary-types": [

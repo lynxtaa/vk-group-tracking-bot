@@ -1,16 +1,17 @@
+import { zip } from 'lodash'
+import ms from 'ms'
+import PQueue from 'p-queue'
 import QuickLRU from 'quick-lru'
+import { StructType } from 'superstruct'
 import { Telegraf } from 'telegraf'
 import { TelegrafContext } from 'telegraf/typings/context'
 import { TelegrafOptions } from 'telegraf/typings/telegraf'
 import { MessageMedia, ExtraMediaGroup, Message } from 'telegraf/typings/telegram-types'
-import { StructType } from 'superstruct'
-import { WallPost } from '../structs'
-import { parseWallPost } from './parseWallPost'
-import PQueue from 'p-queue'
-import ms from 'ms'
-import { zip } from 'lodash'
 
-export class BotWithCache<T extends TelegrafContext> extends Telegraf<T> {
+import { parseWallPost } from './utils/parseWallPost'
+import { WallPost } from './utils/structs'
+
+export class Bot<T extends TelegrafContext> extends Telegraf<T> {
 	fileCache: QuickLRU<string, string>
 	queue: PQueue
 
@@ -21,6 +22,13 @@ export class BotWithCache<T extends TelegrafContext> extends Telegraf<T> {
 
 		// https://core.telegram.org/bots/faq#my-bot-is-hitting-limits-how-do-i-avoid-this
 		this.queue = new PQueue({ interval: ms('1s'), intervalCap: 3 })
+	}
+
+	async isChatAlive(chatId: string | number): Promise<boolean> {
+		return this.telegram
+			.sendChatAction(chatId, 'typing')
+			.then(() => true)
+			.catch(() => false)
 	}
 
 	async sendCachedMediaGroup(

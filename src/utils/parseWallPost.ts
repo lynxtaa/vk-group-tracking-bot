@@ -1,10 +1,11 @@
-import { StructType } from 'superstruct'
 import { sortBy, last } from 'lodash'
+import { StructType } from 'superstruct'
 import { InputMediaPhoto } from 'telegraf/typings/telegram-types'
 
-import { Repost, WallPost } from '../structs'
-import { formatVKLinks } from './formatVKLinks'
 import { vkClient } from '../vkClient'
+
+import { formatVKLinks } from './formatVKLinks'
+import { Repost, WallPost } from './structs'
 
 const getBiggestImage = (sizes: { height: number; url: string; width: number }[]) =>
 	last(sortBy(sizes, (size) => size.height * size.width))
