@@ -2,7 +2,6 @@ import 'dotenv-safe/config'
 
 import ms from 'ms'
 import { URL } from 'url'
-import { Telegraf } from 'telegraf'
 import mongoose from 'mongoose'
 import { TelegrafContext } from 'telegraf/typings/context'
 
@@ -12,6 +11,7 @@ import { ChatModel } from './models/Chat'
 import { Group, GroupModel } from './models/Group'
 import { sendPostToChat } from './utils/sendPostToChat'
 import { checkUpdates } from './checkUpdates'
+import { BotWithCache } from './utils/BotWithCache'
 
 const helpText = [
 	'Привет! Я бот отслеживания постов в группах Вконтакте.',
@@ -23,7 +23,7 @@ const helpText = [
 ].join('\n')
 
 async function main() {
-	const bot = new Telegraf(process.env.BOT_TOKEN)
+	const bot = new BotWithCache(process.env.BOT_TOKEN)
 
 	bot.start((ctx) => ctx.reply(helpText, { disable_web_page_preview: true }))
 
