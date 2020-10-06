@@ -15,7 +15,7 @@ type ParsedPost = {
 	/** Main post text */
 	text: string
 	/** Photo URLs */
-	photos: InputMediaPhoto[]
+	photos: (Omit<InputMediaPhoto, 'media'> & { media: string })[]
 	/** Video Links */
 	videos: string[]
 	/** Repost */
