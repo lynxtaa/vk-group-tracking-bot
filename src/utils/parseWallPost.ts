@@ -1,4 +1,4 @@
-import { sortBy, last } from 'lodash'
+import { sortBy, last, truncate } from 'lodash'
 import { StructType } from 'superstruct'
 import { InputMediaPhoto } from 'telegraf/typings/telegram-types'
 
@@ -6,6 +6,8 @@ import { vkClient } from '../vkClient'
 
 import { formatVKLinks } from './formatVKLinks'
 import { Repost, WallPost } from './structs'
+
+const MAX_MESSAGE_LENGTH = 4096
 
 const getBiggestImage = (sizes: { height: number; url: string; width: number }[]) =>
 	last(sortBy(sizes, (size) => size.height * size.width))
@@ -87,6 +89,8 @@ export async function parseWallPost(
 
 		data.repost = await parseWallPost(info.name, repost)
 	}
+
+	data.text = truncate(data.text, { length: MAX_MESSAGE_LENGTH })
 
 	return data
 }
