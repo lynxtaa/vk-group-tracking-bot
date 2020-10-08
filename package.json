@@ -11,6 +11,8 @@
 		"build": "tsc",
 		"start": "cross-env NODE_ENV=production node build/index.js",
 		"dev": "tsc-watch --onSuccess \"cross-env NODE_ENV=development node build/index.js\"",
+		"validate": "npm run check-format && npm run check-types && npm run lint",
+		"check-format": "prettier src *.{js,json} --check",
 		"lint": "eslint --ext .js,.ts src",
 		"check-types": "tsc --noEmit",
 		"test": "is-ci \"test:coverage\" \"test:watch\"",
