@@ -12,4 +12,7 @@ RUN npm run build \
   && npm prune --production \
   && npm cache clean --force
 
-CMD ["npm", "start"]
+ARG NODE_ENV=production
+ENV NODE_ENV=$NODE_ENV
+
+CMD ["node", "build/index.js"]
