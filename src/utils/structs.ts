@@ -139,7 +139,7 @@ export const PhotoAttachment = type({
 		access_key: string(),
 		sizes: array(Image),
 		text: string(),
-		user_id: number(),
+		user_id: optional(number()),
 	}),
 })
 
