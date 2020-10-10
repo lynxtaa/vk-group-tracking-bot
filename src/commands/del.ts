@@ -4,6 +4,7 @@ import { ChatModel } from '../models/Chat'
 import { GroupModel } from '../models/Group'
 import { getAliasFromURL } from '../utils/getAliasFromURL'
 
+/** удаление отслеживания группы */
 export async function del<T extends TelegrafContext>(ctx: T): Promise<unknown> {
 	if (!ctx.chat || !ctx.message?.text) {
 		return ctx.reply('?')

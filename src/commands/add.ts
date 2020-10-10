@@ -5,6 +5,7 @@ import { GroupModel } from '../models/Group'
 import { getAliasFromURL } from '../utils/getAliasFromURL'
 import { vkClient } from '../vkClient'
 
+/** добавление отслеживания группы */
 export async function add<T extends TelegrafContext>(ctx: T): Promise<unknown> {
 	if (!ctx.message?.text || !ctx.chat) {
 		return ctx.reply('?')

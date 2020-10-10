@@ -3,6 +3,7 @@ import { TelegrafContext } from 'telegraf/typings/context'
 import { ChatModel } from '../models/Chat'
 import { Group } from '../models/Group'
 
+/** список отслеживаемых пользователем групп */
 export async function list(ctx: TelegrafContext): Promise<unknown> {
 	if (!ctx.chat) {
 		return ctx.reply('?')

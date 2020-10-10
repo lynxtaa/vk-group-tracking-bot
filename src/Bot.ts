@@ -24,6 +24,7 @@ export class Bot<T extends TelegrafContext> extends Telegraf<T> {
 		this.queue = new PQueue({ interval: ms('1s'), intervalCap: 3 })
 	}
 
+	/** проверка, живой ли чат */
 	async isChatAlive(chatId: string | number): Promise<boolean> {
 		return this.telegram
 			.sendChatAction(chatId, 'typing')
@@ -31,6 +32,7 @@ export class Bot<T extends TelegrafContext> extends Telegraf<T> {
 			.catch(() => false)
 	}
 
+	/** посылает media group, переиспользуя file_id для уже посланных файлов */
 	async sendCachedMediaGroup(
 		chatId: number | string,
 		media: (Omit<MessageMedia, 'media'> & { media: string })[],
@@ -55,6 +57,7 @@ export class Bot<T extends TelegrafContext> extends Telegraf<T> {
 		return messages
 	}
 
+	/** посылает пост VK в чат */
 	async sendPostToChat({
 		chatId,
 		groupName,

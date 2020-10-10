@@ -4,6 +4,7 @@ import { Bot } from '../Bot'
 import { getAliasFromURL } from '../utils/getAliasFromURL'
 import { vkClient } from '../vkClient'
 
+/** возвращает последний пост указанной группы */
 export function latest<T extends TelegrafContext>(bot: Bot<T>) {
 	return async function (ctx: T): Promise<unknown> {
 		if (!ctx.chat || !ctx.message?.text) {

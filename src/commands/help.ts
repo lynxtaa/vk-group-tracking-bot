@@ -9,6 +9,7 @@ const helpText = [
 	'/del http://vk.com/group123 - удалить группу из отслеживаемых',
 ].join('\n')
 
+/** справка */
 export function help<T extends TelegrafContext>(ctx: T): Promise<unknown> {
 	return ctx.reply(helpText, { disable_web_page_preview: true })
 }
