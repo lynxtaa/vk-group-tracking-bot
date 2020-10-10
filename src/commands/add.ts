@@ -5,7 +5,7 @@ import { GroupModel } from '../models/Group'
 import { getAliasFromURL } from '../utils/getAliasFromURL'
 import { vkClient } from '../vkClient'
 
-export async function groupLink<T extends TelegrafContext>(ctx: T): Promise<unknown> {
+export async function add<T extends TelegrafContext>(ctx: T): Promise<unknown> {
 	if (!ctx.message?.text || !ctx.chat) {
 		return ctx.reply('?')
 	}
@@ -42,7 +42,7 @@ export async function groupLink<T extends TelegrafContext>(ctx: T): Promise<unkn
 	const savedChat = await ChatModel.findOne({ chatId: String(ctx.chat.id) })
 
 	if (savedChat) {
-		if (savedChat.groups.find((id) => id === savedGroup._id)) {
+		if (savedChat.groups.find((id) => String(id) === String(savedGroup._id))) {
 			return ctx.reply(`Группа "${savedGroup.name}" уже отслеживается`)
 		}
 

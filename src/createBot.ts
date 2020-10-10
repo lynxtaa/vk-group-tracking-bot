@@ -1,12 +1,7 @@
 import { TelegrafContext } from 'telegraf/typings/context'
 
 import { Bot } from './Bot'
-import { debug } from './commands/debug'
-import { del } from './commands/del'
-import { help } from './commands/help'
-import { latest } from './commands/latest'
-import { list } from './commands/list'
-import { groupLink } from './text/groupLink'
+import * as commands from './commands'
 import { wrapInCodeBlock } from './utils/wrapInCodeBlock'
 
 export function createBot({
@@ -18,7 +13,7 @@ export function createBot({
 }): Bot<TelegrafContext> {
 	const bot = new Bot(token)
 
-	bot.start(help)
+	bot.start(commands.help)
 
 	bot.catch((err: Error, ctx: TelegrafContext) => {
 		// eslint-disable-next-line no-console
@@ -31,18 +26,18 @@ export function createBot({
 		return ctx.replyWithMarkdown(wrapInCodeBlock(err.stack || err.message))
 	})
 
-	bot.help(help)
+	bot.help(commands.help)
 
-	bot.command('list', list)
+	bot.command('list', commands.list)
 
-	bot.hears(/^http(s)?:/, groupLink)
+	bot.hears(/^http(s)?:/, commands.add)
 
-	bot.command('/latest', latest(bot))
+	bot.command('/latest', commands.latest(bot))
 
-	bot.command('del', del)
+	bot.command('del', commands.del)
 
 	if (isDev) {
-		bot.command('debug', debug)
+		bot.command('debug', commands.debug)
 	}
 
 	return bot
