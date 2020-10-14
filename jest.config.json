@@ -2,5 +2,6 @@
 	"clearMocks": true,
 	"rootDir": "src",
 	"coverageDirectory": "<rootDir>/../coverage",
-	"collectCoverageFrom": ["<rootDir>/**/*.{js,ts}"]
+	"collectCoverageFrom": ["<rootDir>/**/*.{js,ts}"],
+	"testEnvironment": "node"
 }
