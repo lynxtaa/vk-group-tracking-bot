@@ -5,13 +5,18 @@ import QuickLRU from 'quick-lru'
 import { StructType } from 'superstruct'
 import { Telegraf } from 'telegraf'
 import { TelegrafContext } from 'telegraf/typings/context'
+import { SceneContext } from 'telegraf/typings/stage'
 import { TelegrafOptions } from 'telegraf/typings/telegraf'
 import { MessageMedia, ExtraMediaGroup, Message } from 'telegraf/typings/telegram-types'
 
 import { parseWallPost } from './utils/parseWallPost'
 import { WallPost } from './utils/structs'
 
-export class Bot<T extends TelegrafContext> extends Telegraf<T> {
+export interface BotContext extends TelegrafContext {
+	scene: SceneContext<this>
+}
+
+export class Bot extends Telegraf<BotContext> {
 	fileCache: QuickLRU<string, string>
 	queue: PQueue
 

@@ -1,12 +1,10 @@
-import { TelegrafContext } from 'telegraf/typings/context'
-
-import { Bot } from '../Bot'
+import { Bot, BotContext } from '../Bot'
 import { getAliasFromURL } from '../utils/getAliasFromURL'
 import { vkClient } from '../vkClient'
 
 /** возвращает последний пост указанной группы */
-export function latest<T extends TelegrafContext>(bot: Bot<T>) {
-	return async function (ctx: T): Promise<unknown> {
+export function latest(bot: Bot) {
+	return async function (ctx: BotContext): Promise<unknown> {
 		if (!ctx.chat || !ctx.message?.text) {
 			return ctx.reply('?')
 		}

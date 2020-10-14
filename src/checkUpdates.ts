@@ -1,14 +1,11 @@
 import { groupBy } from 'lodash'
-import { TelegrafContext } from 'telegraf/typings/context'
 
 import { Bot } from './Bot'
 import { ChatModel, Chat } from './models/Chat'
 import { GroupModel } from './models/Group'
 import { getNewPosts } from './utils/getNewPosts'
 
-export async function checkUpdates<T extends TelegrafContext>(
-	bot: Bot<T>,
-): Promise<void> {
+export async function checkUpdates(bot: Bot): Promise<void> {
 	const chatsWithGroups = await ChatModel.find({
 		groups: { $exists: true, $ne: [] },
 	})
