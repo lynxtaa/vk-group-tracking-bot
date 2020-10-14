@@ -1,8 +1,15 @@
+import { session, Stage } from 'telegraf'
 import { TelegrafContext } from 'telegraf/typings/context'
+import { SceneContext } from 'telegraf/typings/stage'
 
 import { Bot } from './Bot'
 import * as commands from './commands'
+import { delGroupScene } from './scenes/delGroupScene'
 import { wrapInCodeBlock } from './utils/wrapInCodeBlock'
+
+interface Context extends TelegrafContext {
+	scene: SceneContext<this>
+}
 
 export function createBot({
 	token,
@@ -10,8 +17,13 @@ export function createBot({
 }: {
 	isDev: boolean
 	token: string
-}): Bot<TelegrafContext> {
-	const bot = new Bot(token)
+}): Bot<Context> {
+	const bot = new Bot<Context>(token)
+	const stage = new Stage([delGroupScene], { ttl: 20 })
+
+	bot.use(session())
+
+	bot.use(stage.middleware())
 
 	bot.start(commands.help)
 
@@ -30,11 +42,11 @@ export function createBot({
 
 	bot.command('list', commands.list)
 
+	bot.command('del', (ctx) => ctx.scene.enter(delGroupScene.id))
+
 	bot.hears(/^http(s)?:/, commands.add)
 
-	bot.command('/latest', commands.latest(bot))
-
-	bot.command('del', commands.del)
+	bot.command('latest', commands.latest(bot))
 
 	if (isDev) {
 		bot.command('debug', commands.debug)
