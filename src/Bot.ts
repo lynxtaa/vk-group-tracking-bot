@@ -75,10 +75,19 @@ export class Bot extends Telegraf<BotContext> {
 		return this.queue.add(async () => {
 			const { text, photos, videos, repost } = await parseWallPost(groupName, post)
 
-			await this.telegram.sendMessage(chatId, text, { disable_web_page_preview: true })
+			// Если пост короткий и содержит одну фотографию без подписи,
+			// сделаем текст поста подписью
+			if (text.length < 1024 && photos.length === 1 && !photos[0].caption) {
+				await this.sendCachedMediaGroup(
+					chatId,
+					photos.map((photo) => ({ ...photo, caption: text })),
+				)
+			} else {
+				await this.telegram.sendMessage(chatId, text, { disable_web_page_preview: true })
 
-			if (photos.length > 0) {
-				await this.sendCachedMediaGroup(chatId, photos)
+				if (photos.length > 0) {
+					await this.sendCachedMediaGroup(chatId, photos)
+				}
 			}
 
 			for (const videoLink of videos) {
