@@ -1,27 +1,20 @@
 import { groupBy } from 'lodash'
 
 import { Bot } from './Bot'
-import { ChatModel, Chat } from './models/Chat'
+import { ChatModel } from './models/Chat'
 import { GroupModel } from './models/Group'
 import { getNewPosts } from './utils/getNewPosts'
 
+const MAX_FAILED_SENDS = 100
+
 export async function checkUpdates(bot: Bot): Promise<void> {
-	const chatsWithGroups = await ChatModel.find({
+	const chatsToCheck = await ChatModel.find({
 		groups: { $exists: true, $ne: [] },
+		failedSends: { $lt: MAX_FAILED_SENDS },
 	})
 
-	const aliveChats: Chat[] = []
-
-	for (const chat of chatsWithGroups) {
-		const isAlive = await bot.isChatAlive(chat.chatId)
-
-		if (isAlive) {
-			aliveChats.push(chat)
-		}
-	}
-
 	const byGroupId = groupBy(
-		aliveChats.flatMap((chat) => chat.groups.map((groupId) => ({ chat, groupId }))),
+		chatsToCheck.flatMap((chat) => chat.groups.map((groupId) => ({ chat, groupId }))),
 		(el) => el.groupId,
 	)
 
@@ -61,11 +54,17 @@ export async function checkUpdates(bot: Bot): Promise<void> {
 			for (const { chat } of byGroupId[group._id]) {
 				try {
 					await bot.sendPostToChat({ chatId: chat.chatId, post, groupName: group.name })
+					if (chat.failedSends > 0) {
+						chat.failedSends = 0
+						await chat.save()
+					}
 				} catch (err) {
 					// eslint-disable-next-line no-console
 					console.error(
 						`Error in sending post ${post.id} to chat ${chat.chatId} (${err})`,
 					)
+					chat.failedSends++
+					await chat.save()
 				}
 			}
 		}

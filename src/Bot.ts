@@ -29,14 +29,6 @@ export class Bot extends Telegraf<BotContext> {
 		this.queue = new PQueue({ interval: ms('1s'), intervalCap: 3 })
 	}
 
-	/** проверка, живой ли чат */
-	async isChatAlive(chatId: string | number): Promise<boolean> {
-		return this.telegram
-			.sendChatAction(chatId, 'typing')
-			.then(() => true)
-			.catch(() => false)
-	}
-
 	/** посылает media group, переиспользуя file_id для уже посланных файлов */
 	async sendCachedMediaGroup(
 		chatId: number | string,

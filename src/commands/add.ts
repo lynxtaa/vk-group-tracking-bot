@@ -59,6 +59,7 @@ export async function add<T extends TelegrafContext>(ctx: T): Promise<unknown> {
 		await ChatModel.create({
 			chatId: String(ctx.chat.id),
 			createdAt: new Date(),
+			failedSends: 0,
 			groups: [savedGroup._id],
 		})
 	}
