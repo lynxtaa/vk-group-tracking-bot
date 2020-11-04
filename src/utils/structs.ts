@@ -136,7 +136,7 @@ export const PhotoAttachment = type({
 		id: number(),
 		owner_id: number(),
 		has_tags: boolean(),
-		access_key: string(),
+		access_key: optional(string()),
 		sizes: array(Image),
 		text: string(),
 		user_id: optional(number()),
