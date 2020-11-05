@@ -1,3 +1,4 @@
+import { isDocumentArray } from '@typegoose/typegoose'
 import { sortBy } from 'lodash'
 
 import { ChatModel } from '../models/Chat'
@@ -7,11 +8,9 @@ import { Group } from '../models/Group'
 export async function getUserGroups(chatId: string): Promise<Group[]> {
 	const chat = await ChatModel.findOne({ chatId }).populate('groups')
 
-	if (!chat) {
+	if (!chat || !isDocumentArray(chat.groups)) {
 		return []
 	}
 
-	const groups = (chat.groups as unknown) as Group[]
-
-	return sortBy(groups, (group) => group.name)
+	return sortBy(chat.groups, (group) => group.name)
 }

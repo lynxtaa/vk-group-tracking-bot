@@ -1,18 +1,19 @@
-import { Schema, Document, model } from 'mongoose'
+import { prop, getModelForClass, Ref } from '@typegoose/typegoose'
 
-export interface Chat extends Document {
-	createdAt: Date
-	chatId: string
-	failedSends: number
-	groups: Schema.Types.ObjectId[]
+import { Group } from './Group'
+
+class Chat {
+	@prop()
+	createdAt!: Date
+
+	@prop()
+	chatId!: string
+
+	@prop()
+	failedSends!: number
+
+	@prop({ ref: Group })
+	groups!: Ref<Group>[]
 }
 
-export const ChatModel = model<Chat>(
-	'Chat',
-	new Schema({
-		createdAt: { type: Date, required: true },
-		chatId: { type: String, required: true },
-		failedSends: { type: Number, required: true },
-		groups: [{ type: Schema.Types.ObjectId, ref: 'Group' }],
-	}),
-)
+export const ChatModel = getModelForClass(Chat)

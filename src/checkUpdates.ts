@@ -51,7 +51,7 @@ export async function checkUpdates(bot: Bot): Promise<void> {
 		}
 
 		for (const post of result.value) {
-			for (const { chat } of byGroupId[group._id]) {
+			for (const { chat } of byGroupId[String(group._id)]) {
 				try {
 					await bot.sendPostToChat({ chatId: chat.chatId, post, groupName: group.name })
 					if (chat.failedSends > 0) {
