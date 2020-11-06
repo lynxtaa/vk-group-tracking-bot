@@ -2,7 +2,14 @@
 	"root": true,
 	"parser": "@typescript-eslint/parser",
 	"plugins": ["@typescript-eslint", "import"],
-	"extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended"],
+	"extends": [
+		"eslint:recommended",
+		"plugin:@typescript-eslint/recommended",
+		"plugin:@typescript-eslint/recommended-requiring-type-checking"
+	],
+	"parserOptions": {
+		"project": "./tsconfig.json"
+	},
 	"settings": {
 		"import/extensions": [".js", ".ts"]
 	},
@@ -28,6 +35,6 @@
 			"warn",
 			{ "allowArgumentsExplicitlyTypedAsAny": true }
 		],
-		"@typescript-eslint/no-extra-semi": "off"
+		"@typescript-eslint/restrict-template-expressions": "off"
 	}
 }

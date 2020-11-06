@@ -8,6 +8,7 @@ jest.mock('../vkClient', () => ({
 	vkClient: { getWall: jest.fn() },
 }))
 
+// eslint-disable-next-line @typescript-eslint/unbound-method
 const mockGetWall = vkClient.getWall as jest.Mock<
 	ReturnType<VKClient['getWall']>,
 	Parameters<VKClient['getWall']>
@@ -35,7 +36,9 @@ it('returns latest non-ad post if no last post saved', async () => {
 	expect(newPosts).toEqual([posts[1]])
 	expect(mockGetWall).toHaveBeenCalledWith({
 		owner_id: 10,
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 		count: expect.any(Number),
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 		offset: expect.any(Number),
 	})
 })

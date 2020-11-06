@@ -6,7 +6,7 @@ export function formatVKLinks(text: string): string {
 	return text.replace(
 		/\[(?<link>(http(s)?:\/\/.+?)|([\d\w]+?))\|(?<text>.+?)\]/g,
 		(...args) => {
-			const { link, text }: { link: string; text: string } = args[args.length - 1]
+			const { link, text } = args[args.length - 1] as { link: string; text: string }
 			return `${text} (${link.startsWith('http') ? link : `https://vk.com/${link}`})`
 		},
 	)

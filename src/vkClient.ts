@@ -58,7 +58,9 @@ export class VKClient {
 			throw new Error(`Request failed: ${response.url}: ${response.status}`)
 		}
 
-		const json = await response.json()
+		const json = (await response.json()) as
+			| { error: { error_msg: string } }
+			| { response: Record<string, unknown> | unknown[] }
 
 		if (this.debug) {
 			// eslint-disable-next-line no-console

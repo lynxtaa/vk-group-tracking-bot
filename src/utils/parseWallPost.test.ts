@@ -7,6 +7,7 @@ jest.mock('../vkClient', () => ({
 	vkClient: { getGroupById: jest.fn() },
 }))
 
+// eslint-disable-next-line @typescript-eslint/unbound-method
 const mockGetGroupById = vkClient.getGroupById as jest.Mock<
 	ReturnType<VKClient['getGroupById']>,
 	Parameters<VKClient['getGroupById']>

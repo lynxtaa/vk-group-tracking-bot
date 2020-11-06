@@ -24,15 +24,19 @@ async function main() {
 	// eslint-disable-next-line no-console
 	console.log('Bot launched...')
 
-	// eslint-disable-next-line no-console
-	const safeCheck = () => checkUpdates(bot).catch(console.error.bind(console))
+	function safeCheck() {
+		// eslint-disable-next-line no-console
+		checkUpdates(bot).catch(console.error.bind(console))
+	}
 
 	setInterval(safeCheck, ms(process.env.CHECK_INTERVAL || '15m'))
 
 	safeCheck()
 }
 
-main()
+main().catch((err) => {
+	throw err
+})
 
 process.on('unhandledRejection', (err) => {
 	throw err
