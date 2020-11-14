@@ -65,7 +65,7 @@ export class Bot extends Telegraf<BotContext> {
 		post: StructType<typeof WallPost>
 	}): Promise<void> {
 		return this.queue.add(async () => {
-			const { text, photos, videos, repost } = await parseWallPost(groupName, post)
+			const { text, photos, links, videos, repost } = await parseWallPost(groupName, post)
 
 			// Если пост короткий и содержит одну фотографию без подписи,
 			// сделаем текст поста подписью
@@ -84,6 +84,10 @@ export class Bot extends Telegraf<BotContext> {
 
 			for (const videoLink of videos) {
 				await this.telegram.sendMessage(chatId, videoLink)
+			}
+
+			for (const link of links) {
+				await this.telegram.sendMessage(chatId, link)
 			}
 
 			if (repost) {

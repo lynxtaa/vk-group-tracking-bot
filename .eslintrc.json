@@ -5,13 +5,13 @@
 	"extends": [
 		"eslint:recommended",
 		"plugin:@typescript-eslint/recommended",
-		"plugin:@typescript-eslint/recommended-requiring-type-checking"
+		"plugin:@typescript-eslint/recommended-requiring-type-checking",
+		"plugin:import/errors",
+		"plugin:import/warnings",
+		"plugin:import/typescript"
 	],
 	"parserOptions": {
 		"project": "./tsconfig.json"
-	},
-	"settings": {
-		"import/extensions": [".js", ".ts"]
 	},
 	"env": {
 		"es6": true,
@@ -20,10 +20,6 @@
 	"rules": {
 		"no-mixed-spaces-and-tabs": "off",
 		"no-console": "warn",
-		"import/no-cycle": "error",
-		"import/no-useless-path-segments": "warn",
-		"import/no-unused-modules": "warn",
-		"import/first": "warn",
 		"import/order": [
 			"warn",
 			{ "alphabetize": { "order": "asc" }, "newlines-between": "always" }

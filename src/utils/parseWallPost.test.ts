@@ -24,6 +24,7 @@ it('returns parsed post', async () => {
 	expect(parsedPost).toMatchInlineSnapshot(`
 		Object {
 		  "audios": Array [],
+		  "links": Array [],
 		  "photos": Array [],
 		  "repost": null,
 		  "text": "Город
@@ -67,6 +68,7 @@ it('parses attached photos', async () => {
 	expect(parsedPost).toMatchInlineSnapshot(`
 		Object {
 		  "audios": Array [],
+		  "links": Array [],
 		  "photos": Array [
 		    Object {
 		      "media": "https://big-image.jpg",
@@ -118,13 +120,10 @@ it('parses attached links', async () => {
 	expect(parsedPost).toMatchInlineSnapshot(`
 		Object {
 		  "audios": Array [],
-		  "photos": Array [
-		    Object {
-		      "caption": "Example.com (http://example.com)",
-		      "media": "https://big-image.jpg",
-		      "type": "photo",
-		    },
+		  "links": Array [
+		    "http://example.com",
 		  ],
+		  "photos": Array [],
 		  "repost": null,
 		  "text": "Город
 		https://vk.com/wall123_10
@@ -165,6 +164,7 @@ it('parses attached videos', async () => {
 	expect(parsedPost).toMatchInlineSnapshot(`
 		Object {
 		  "audios": Array [],
+		  "links": Array [],
 		  "photos": Array [],
 		  "repost": null,
 		  "text": "Город
@@ -201,6 +201,7 @@ it('parses attached market', async () => {
 	expect(parsedPost).toMatchInlineSnapshot(`
 		Object {
 		  "audios": Array [],
+		  "links": Array [],
 		  "photos": Array [
 		    Object {
 		      "caption": "Кофемолка (100$)",
@@ -244,6 +245,7 @@ it('parses attached audios', async () => {
 		  "audios": Array [
 		    "Аудио: Pink Floyd - Money",
 		  ],
+		  "links": Array [],
 		  "photos": Array [],
 		  "repost": null,
 		  "text": "Город
@@ -272,9 +274,11 @@ it('parses repost', async () => {
 	expect(parsedPost).toMatchInlineSnapshot(`
 		Object {
 		  "audios": Array [],
+		  "links": Array [],
 		  "photos": Array [],
 		  "repost": Object {
 		    "audios": Array [],
+		    "links": Array [],
 		    "photos": Array [],
 		    "repost": null,
 		    "text": "Какая-то группа

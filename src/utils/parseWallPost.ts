@@ -19,6 +19,8 @@ type ParsedPost = {
 	text: string
 	/** Photo URLs */
 	photos: (Omit<InputMediaPhoto, 'media'> & { media: string })[]
+	/** Links */
+	links: string[]
 	/** Video Links */
 	videos: string[]
 	/** Repost */
@@ -42,6 +44,7 @@ export async function parseWallPost(
 		audios: [],
 		videos: [],
 		photos: [],
+		links: [],
 		repost: null,
 	}
 
@@ -52,16 +55,8 @@ export async function parseWallPost(
 			if (biggestPhoto) {
 				data.photos.push({ type: 'photo', media: biggestPhoto.url })
 			}
-		} else if (attach.type === 'link' && attach.link.photo) {
-			const biggestPhoto = getBiggestImage(attach.link.photo.sizes)
-
-			if (biggestPhoto) {
-				data.photos.push({
-					type: 'photo',
-					media: biggestPhoto.url,
-					caption: `${attach.link.title} (${attach.link.url})`,
-				})
-			}
+		} else if (attach.type === 'link') {
+			data.links.push(attach.link.url)
 		} else if (attach.type === 'video') {
 			data.videos.push(`https://vk.com/video${attach.video.owner_id}_${attach.video.id}`)
 		} else if (attach.type === 'market') {
