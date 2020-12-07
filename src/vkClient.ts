@@ -3,7 +3,7 @@ import { URLSearchParams } from 'url'
 import ms from 'ms'
 import fetch from 'node-fetch'
 import PQueue from 'p-queue'
-import { assert, array, number, type, string, StructType, optional } from 'superstruct'
+import { assert, array, number, type, string, Infer, optional } from 'superstruct'
 
 import { WallPost } from './utils/structs'
 
@@ -86,7 +86,7 @@ export class VKClient {
 		/** определяет, какие типы записей на стене необходимо получить */
 		filter?: 'owner' | 'others' | 'all'
 		offset?: number
-	}): Promise<StructType<typeof WallPosts>> {
+	}): Promise<Infer<typeof WallPosts>> {
 		const data = await this.callMethod('wall.get', params)
 
 		assert(data, WallPosts)
@@ -95,9 +95,7 @@ export class VKClient {
 	}
 
 	/** Возвращает информацию о заданном сообществе */
-	async getGroupById(params: {
-		group_id: string
-	}): Promise<StructType<typeof GroupInfos>> {
+	async getGroupById(params: { group_id: string }): Promise<Infer<typeof GroupInfos>> {
 		const data = await this.callMethod('groups.getById', params)
 
 		assert(data, GroupInfos)

@@ -41,7 +41,7 @@
 		"node-fetch": "2.6.1",
 		"p-queue": "6.6.1",
 		"quick-lru": "5.1.1",
-		"superstruct": "0.10.12",
+		"superstruct": "0.12.1",
 		"telegraf": "3.38.0"
 	},
 	"devDependencies": {

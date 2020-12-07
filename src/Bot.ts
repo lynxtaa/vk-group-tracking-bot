@@ -2,7 +2,7 @@ import { zip } from 'lodash'
 import ms from 'ms'
 import PQueue from 'p-queue'
 import QuickLRU from 'quick-lru'
-import { StructType } from 'superstruct'
+import { Infer } from 'superstruct'
 import { Telegraf } from 'telegraf'
 import { TelegrafContext } from 'telegraf/typings/context'
 import { SceneContext } from 'telegraf/typings/stage'
@@ -62,7 +62,7 @@ export class Bot extends Telegraf<BotContext> {
 	}: {
 		chatId: string
 		groupName: string
-		post: StructType<typeof WallPost>
+		post: Infer<typeof WallPost>
 	}): Promise<void> {
 		return this.queue.add(async () => {
 			const { text, photos, links, videos, repost } = await parseWallPost(groupName, post)

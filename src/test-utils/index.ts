@@ -1,10 +1,10 @@
-import { StructType } from 'superstruct'
+import { Infer } from 'superstruct'
 
 import { WallPost } from '../utils/structs'
 
 export const generatePost = (
-	overrides?: Partial<StructType<typeof WallPost>>,
-): StructType<typeof WallPost> => ({
+	overrides?: Partial<Infer<typeof WallPost>>,
+): Infer<typeof WallPost> => ({
 	id: 10,
 	from_id: 123,
 	owner_id: 123,

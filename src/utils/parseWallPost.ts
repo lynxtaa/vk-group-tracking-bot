@@ -1,5 +1,5 @@
 import { sortBy, last, truncate } from 'lodash'
-import { StructType } from 'superstruct'
+import { Infer } from 'superstruct'
 import { InputMediaPhoto } from 'telegraf/typings/telegram-types'
 
 import { vkClient } from '../vkClient'
@@ -29,7 +29,7 @@ type ParsedPost = {
 
 export async function parseWallPost(
 	groupName: string,
-	post: StructType<typeof WallPost> | StructType<typeof Repost>,
+	post: Infer<typeof WallPost> | Infer<typeof Repost>,
 ): Promise<ParsedPost> {
 	const data: ParsedPost = {
 		text: [
