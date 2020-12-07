@@ -30,18 +30,18 @@
 		}
 	},
 	"dependencies": {
-		"@typegoose/typegoose": "7.4.1",
-		"cross-env": "7.0.2",
+		"@typegoose/typegoose": "7.4.5",
+		"cross-env": "7.0.3",
 		"date-fns": "2.16.1",
 		"dotenv-safe": "8.2.0",
 		"lodash": "4.17.20",
 		"markdown-escape": "1.1.0",
-		"mongoose": "5.10.7",
+		"mongoose": "5.11.5",
 		"ms": "2.1.2",
 		"node-fetch": "2.6.1",
-		"p-queue": "6.6.1",
+		"p-queue": "6.6.2",
 		"quick-lru": "5.1.1",
-		"superstruct": "0.10.12",
+		"superstruct": "0.12.1",
 		"telegraf": "3.38.0"
 	},
 	"devDependencies": {
