@@ -1,6 +1,6 @@
 {
 	"extends": ["config:base"],
-	"assigneesFromCodeOwners": true,
+	"assignees": ["lynxtaa"],
 	"timezone": "Europe/Moscow",
 	"schedule": "after 10am on the first day of the month",
 	"packageRules": [
