@@ -55,7 +55,7 @@ export class Bot extends Telegraf<BotContext> {
 	}
 
 	/** посылает пост VK в чат */
-	async sendPostToChat({
+	sendPostToChat({
 		chatId,
 		groupName,
 		post,
@@ -67,13 +67,15 @@ export class Bot extends Telegraf<BotContext> {
 		return this.queue.add(async () => {
 			const { text, photos, links, videos, repost } = await parseWallPost(groupName, post)
 
-			// Если пост короткий и содержит одну фотографию без подписи,
-			// сделаем текст поста подписью
-			if (text.length < 1024 && photos.length === 1 && !photos[0].caption) {
-				await this.sendCachedMediaGroup(
-					chatId,
-					photos.map((photo) => ({ ...photo, caption: text })),
-				)
+			// Если пост короткий и у первой фотографии нет подписи,
+			// сделаем текст поста подписью для первой фотографии
+			if (text.length < 1024 && photos.length > 0 && !photos[0].caption) {
+				const [firstPhoto, ...rest] = photos
+
+				await this.sendCachedMediaGroup(chatId, [
+					{ ...firstPhoto, caption: text },
+					...rest,
+				])
 			} else {
 				await this.telegram.sendMessage(chatId, text, { disable_web_page_preview: true })
 
