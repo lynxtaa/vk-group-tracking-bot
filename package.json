@@ -6,7 +6,7 @@
 	"homepage": "https://github.com/lynxtaa/vk-group-tracking-bot#readme",
 	"main": "index.js",
 	"engines": {
-		"node": "12.x"
+		"node": ">=14.0.0"
 	},
 	"scripts": {
 		"prebuild": "rimraf ./build/*",
