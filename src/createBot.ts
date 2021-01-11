@@ -1,5 +1,4 @@
-import { session, Stage } from 'telegraf'
-import { TelegrafContext } from 'telegraf/typings/context'
+import { session, Scenes } from 'telegraf'
 
 import { Bot } from './Bot'
 import * as commands from './commands'
@@ -8,7 +7,7 @@ import { wrapInCodeBlock } from './utils/wrapInCodeBlock'
 
 export function createBot({ token, isDev }: { isDev: boolean; token: string }): Bot {
 	const bot = new Bot(token)
-	const stage = new Stage([delGroupScene], { ttl: 20 })
+	const stage = new Scenes.Stage([delGroupScene], { ttl: 20 })
 
 	bot.use(session())
 
@@ -16,15 +15,17 @@ export function createBot({ token, isDev }: { isDev: boolean; token: string }): 
 
 	bot.start(commands.help)
 
-	bot.catch((err: Error, ctx: TelegrafContext) => {
+	bot.catch(async (err, ctx) => {
 		// eslint-disable-next-line no-console
 		console.error(`Ooops, encountered an error for ${ctx.updateType}`, err)
 
-		if (!isDev) {
-			return ctx.reply('Ой, ошибка...')
+		if (isDev) {
+			await ctx.replyWithMarkdown(
+				wrapInCodeBlock(err instanceof Error ? err.stack || err.message : String(err)),
+			)
+		} else {
+			await ctx.reply('Ой, ошибка...')
 		}
-
-		return ctx.replyWithMarkdown(wrapInCodeBlock(err.stack || err.message))
 	})
 
 	bot.help(commands.help)

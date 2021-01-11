@@ -1,13 +1,14 @@
-import { BaseScene, Markup } from 'telegraf'
+import { Scenes, Markup } from 'telegraf'
 
+import { BotContext } from '../Bot'
 import { ChatModel } from '../models/Chat'
 import { GroupModel } from '../models/Group'
 import { getUserGroups } from '../utils/getUserGroups'
 
-export const delGroupScene = new BaseScene('delGroupScene')
+export const delGroupScene = new Scenes.BaseScene<BotContext>('delGroupScene')
 
 delGroupScene.enter(async (ctx) => {
-	if (!ctx.chat || !ctx.message?.text) {
+	if (!ctx.chat || !ctx.message) {
 		return ctx.reply('?')
 	}
 
@@ -21,9 +22,9 @@ delGroupScene.enter(async (ctx) => {
 	return ctx.reply(
 		'Выберите группу, от которой хотите отписаться',
 		Markup.inlineKeyboard(
-			groups.map((group) => Markup.callbackButton(group.name, String(group._id))),
+			groups.map((group) => Markup.button.callback(group.name, String(group._id))),
 			{ columns: 1 },
-		).extra(),
+		),
 	)
 })
 

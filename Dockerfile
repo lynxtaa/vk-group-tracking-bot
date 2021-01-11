@@ -2,11 +2,11 @@ FROM node:14.15.1-alpine
 
 WORKDIR /bot
 
-RUN npm install -g npm@7.3.0
+RUN npm install -g npm@7.4.1
 
 COPY package*.json ./
 
-RUN npm ci --silent
+RUN npm ci --legacy-peer-deps
 
 COPY . .
 

@@ -1,9 +1,8 @@
-import { TelegrafContext } from 'telegraf/typings/context'
-
+import { BotContext } from '../Bot'
 import { getUserGroups } from '../utils/getUserGroups'
 
 /** список отслеживаемых пользователем групп */
-export async function list(ctx: TelegrafContext): Promise<unknown> {
+export async function list(ctx: BotContext): Promise<unknown> {
 	if (!ctx.chat) {
 		return ctx.reply('?')
 	}

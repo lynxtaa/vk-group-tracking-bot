@@ -5,7 +5,7 @@ import { vkClient } from '../vkClient'
 /** возвращает последний пост указанной группы */
 export function latest(bot: Bot) {
 	return async function (ctx: BotContext): Promise<unknown> {
-		if (!ctx.chat || !ctx.message?.text) {
+		if (!ctx.chat || !ctx.message || !('text' in ctx.message)) {
 			return ctx.reply('?')
 		}
 

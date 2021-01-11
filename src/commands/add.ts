@@ -1,13 +1,12 @@
-import { TelegrafContext } from 'telegraf/typings/context'
-
+import { BotContext } from '../Bot'
 import { ChatModel } from '../models/Chat'
 import { GroupModel } from '../models/Group'
 import { getAliasFromURL } from '../utils/getAliasFromURL'
 import { vkClient } from '../vkClient'
 
 /** добавление отслеживания группы */
-export async function add<T extends TelegrafContext>(ctx: T): Promise<unknown> {
-	if (!ctx.message?.text || !ctx.chat) {
+export async function add(ctx: BotContext): Promise<unknown> {
+	if (!ctx.message || !('text' in ctx.message) || !ctx.chat) {
 		return ctx.reply('?')
 	}
 

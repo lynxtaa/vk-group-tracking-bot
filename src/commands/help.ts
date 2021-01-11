@@ -1,4 +1,4 @@
-import { TelegrafContext } from 'telegraf/typings/context'
+import { BotContext } from '../Bot'
 
 const helpText = [
 	'Привет! Я бот отслеживания постов в группах Вконтакте.',
@@ -10,6 +10,6 @@ const helpText = [
 ].join('\n')
 
 /** справка */
-export function help<T extends TelegrafContext>(ctx: T): Promise<unknown> {
+export function help(ctx: BotContext): Promise<unknown> {
 	return ctx.reply(helpText, { disable_web_page_preview: true })
 }

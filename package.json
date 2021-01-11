@@ -42,7 +42,7 @@
 		"p-queue": "6.6.2",
 		"quick-lru": "5.1.1",
 		"superstruct": "0.12.1",
-		"telegraf": "3.38.0"
+		"telegraf": "4.0.1"
 	},
 	"devDependencies": {
 		"@babel/plugin-proposal-class-properties": "7.12.1",

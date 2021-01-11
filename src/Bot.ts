@@ -3,24 +3,23 @@ import ms from 'ms'
 import PQueue from 'p-queue'
 import QuickLRU from 'quick-lru'
 import { Infer } from 'superstruct'
-import { Telegraf } from 'telegraf'
-import { TelegrafContext } from 'telegraf/typings/context'
-import { SceneContext } from 'telegraf/typings/stage'
-import { TelegrafOptions } from 'telegraf/typings/telegraf'
-import { MessageMedia, ExtraMediaGroup, Message } from 'telegraf/typings/telegram-types'
+import { Telegraf, Scenes } from 'telegraf'
+import {
+	ExtraMediaGroup,
+	InputMediaPhoto,
+	Message,
+} from 'telegraf/typings/telegram-types'
 
 import { parseWallPost } from './utils/parseWallPost'
 import { WallPost } from './utils/structs'
 
-export interface BotContext extends TelegrafContext {
-	scene: SceneContext<this>
-}
+export type BotContext = Scenes.SceneContext
 
 export class Bot extends Telegraf<BotContext> {
 	fileCache: QuickLRU<string, string>
 	queue: PQueue
 
-	constructor(token: string, options?: TelegrafOptions) {
+	constructor(token: string, options?: Telegraf['options']) {
 		super(token, options)
 
 		this.fileCache = new QuickLRU<string, string>({ maxSize: 1000 })
@@ -32,7 +31,7 @@ export class Bot extends Telegraf<BotContext> {
 	/** посылает media group, переиспользуя file_id для уже посланных файлов */
 	async sendCachedMediaGroup(
 		chatId: number | string,
-		media: (Omit<MessageMedia, 'media'> & { media: string })[],
+		media: (Omit<InputMediaPhoto, 'media'> & { media: string })[],
 		extra?: ExtraMediaGroup,
 	): Promise<Message[]> {
 		const messages = await this.telegram.sendMediaGroup(
@@ -45,9 +44,11 @@ export class Bot extends Telegraf<BotContext> {
 		)
 
 		for (const [file, message] of zip(media, messages)) {
-			const fileId = message?.photo?.[0]?.file_id
-			if (file && fileId) {
-				this.fileCache.set(file.media, fileId)
+			if (message && 'photo' in message) {
+				const fileId = message.photo[0]?.file_id
+				if (file && fileId) {
+					this.fileCache.set(file.media, fileId)
+				}
 			}
 		}
 
