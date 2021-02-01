@@ -40,7 +40,7 @@
 		"ms": "2.1.2",
 		"node-fetch": "2.6.1",
 		"p-queue": "6.6.2",
-		"quick-lru": "5.1.1",
+		"quick-lru": "6.0.0",
 		"superstruct": "0.12.1",
 		"telegraf": "4.0.1"
 	},
