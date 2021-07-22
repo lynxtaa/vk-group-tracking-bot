@@ -1,10 +1,10 @@
-FROM node:15.6.0-alpine
+FROM node:14.17.3-alpine
 
 WORKDIR /bot
 
 COPY package*.json ./
 
-RUN npm ci --legacy-peer-deps
+RUN npm ci
 
 COPY . .
 
@@ -15,4 +15,4 @@ RUN npm run build \
 ARG NODE_ENV=production
 ENV NODE_ENV=$NODE_ENV
 
-CMD ["node", "build/index.js"]
+CMD ["npm", "start"]

@@ -41,8 +41,8 @@ export async function checkUpdates(bot: Bot): Promise<void> {
 	)
 
 	for (let i = 0; i < checkResults.length; i++) {
-		const result = checkResults[i]
-		const group = groups[i]
+		const result = checkResults[i]!
+		const group = groups[i]!
 
 		if (result.status === 'rejected') {
 			// eslint-disable-next-line no-console
@@ -51,7 +51,7 @@ export async function checkUpdates(bot: Bot): Promise<void> {
 		}
 
 		for (const post of result.value) {
-			for (const { chat } of byGroupId[String(group._id)]) {
+			for (const { chat } of byGroupId[String(group._id)]!) {
 				try {
 					await bot.sendPostToChat({ chatId: chat.chatId, post, groupName: group.name })
 					if (chat.failedSends > 0) {

@@ -8,6 +8,7 @@
 		"allowSyntheticDefaultImports": true,
 		"strict": true,
 		"forceConsistentCasingInFileNames": true,
+		"noUncheckedIndexedAccess": true,
 		"module": "CommonJS",
 		"moduleResolution": "node",
 		"resolveJsonModule": true,

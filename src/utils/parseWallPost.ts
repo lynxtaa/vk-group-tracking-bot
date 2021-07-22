@@ -1,6 +1,6 @@
 import { sortBy, last, truncate } from 'lodash'
 import { Infer } from 'superstruct'
-import { InputMediaPhoto } from 'telegraf/typings/telegram-types'
+import { InputMediaPhoto } from 'telegraf/typings/core/types/typegram'
 
 import { vkClient } from '../vkClient'
 
@@ -82,7 +82,7 @@ export async function parseWallPost(
 			group_id: String(0 - repost.owner_id),
 		})
 
-		data.repost = await parseWallPost(info.name, repost)
+		data.repost = await parseWallPost(info!.name, repost)
 	}
 
 	data.text = truncate(data.text, { length: MAX_MESSAGE_LENGTH })

@@ -16,7 +16,7 @@ export async function add(ctx: BotContext): Promise<unknown> {
 
 	try {
 		const infos = await vkClient.getGroupById({ group_id: alias })
-		info = infos[0]
+		info = infos[0]!
 	} catch (err) {
 		return ctx.reply(`Группа закрытая либо не существует`)
 	}

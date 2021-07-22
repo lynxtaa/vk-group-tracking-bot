@@ -4,11 +4,8 @@ import PQueue from 'p-queue'
 import QuickLRU from 'quick-lru'
 import { Infer } from 'superstruct'
 import { Telegraf, Scenes } from 'telegraf'
-import {
-	ExtraMediaGroup,
-	InputMediaPhoto,
-	Message,
-} from 'telegraf/typings/telegram-types'
+import { InputMediaPhoto, Message } from 'telegraf/typings/core/types/typegram'
+import { ExtraMediaGroup } from 'telegraf/typings/telegram-types'
 
 import { parseWallPost } from './utils/parseWallPost'
 import { WallPost } from './utils/structs'
@@ -70,7 +67,7 @@ export class Bot extends Telegraf<BotContext> {
 
 			// Если пост короткий и у первой фотографии нет подписи,
 			// сделаем текст поста подписью для первой фотографии
-			if (text.length < 1024 && photos.length > 0 && !photos[0].caption) {
+			if (text.length < 1024 && photos[0] && !photos[0].caption) {
 				const [firstPhoto, ...rest] = photos
 
 				await this.sendCachedMediaGroup(chatId, [

@@ -10,13 +10,18 @@ export function latest(bot: Bot) {
 		}
 
 		const [, url] = ctx.message.text.split(' ')
+
+		if (!url) {
+			return ctx.reply('?')
+		}
+
 		const alias = getAliasFromURL(url)
 
 		let info: { id: number; name: string }
 
 		try {
 			const infos = await vkClient.getGroupById({ group_id: alias })
-			info = infos[0]
+			info = infos[0]!
 		} catch (err) {
 			return ctx.reply(`Группа закрытая либо не существует`)
 		}
