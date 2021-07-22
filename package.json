@@ -1,6 +1,6 @@
 {
 	"name": "vk-group-tracking-bot",
-	"version": "0.7.1",
+	"version": "0.8.0",
 	"description": "Read your VK news in Telegram",
 	"repository": "https://github.com/lynxtaa/vk-group-tracking-bot.git",
 	"homepage": "https://github.com/lynxtaa/vk-group-tracking-bot#readme",
@@ -25,7 +25,7 @@
 	"author": "Alex Kondratyuk",
 	"license": "ISC",
 	"simple-git-hooks": {
-	  "pre-commit": "npx pretty-quick --staged"
+		"pre-commit": "npx pretty-quick --staged"
 	},
 	"dependencies": {
 		"@typegoose/typegoose": "7.6.3",
