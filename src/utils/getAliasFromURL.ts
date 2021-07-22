@@ -10,5 +10,5 @@ import { URL } from 'url'
  */
 export function getAliasFromURL(url: string): string {
 	const { pathname } = new URL(url)
-	return pathname.replace('/', '')
+	return pathname.replace('/', '').replace(/^public(\d+)/, 'club$1')
 }
