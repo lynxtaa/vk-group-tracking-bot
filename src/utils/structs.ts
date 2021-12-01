@@ -19,7 +19,7 @@ const Image = type({
 export const AlbumAttachment = type({
 	type: literal('album'),
 	album: type({
-		id: string(),
+		id: number(),
 		thumb: type({
 			album_id: number(),
 			date: number(),
