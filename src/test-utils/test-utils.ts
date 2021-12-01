@@ -1,6 +1,6 @@
 import { Infer } from 'superstruct'
 
-import { WallPost } from '../utils/structs'
+import { WallPost } from '../utils/structs.js'
 
 export const generatePost = (
 	overrides?: Partial<Infer<typeof WallPost>>,

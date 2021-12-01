@@ -1,8 +1,8 @@
-import { BotContext } from '../Bot'
-import { ChatModel } from '../models/Chat'
-import { GroupModel } from '../models/Group'
-import { getAliasFromURL } from '../utils/getAliasFromURL'
-import { vkClient } from '../vkClient'
+import { BotContext } from '../Bot.js'
+import { ChatModel } from '../models/Chat.js'
+import { GroupModel } from '../models/Group.js'
+import { getAliasFromURL } from '../utils/getAliasFromURL.js'
+import { vkClient } from '../vkClient.js'
 
 /** добавление отслеживания группы */
 export async function add(ctx: BotContext): Promise<unknown> {
@@ -42,7 +42,7 @@ export async function add(ctx: BotContext): Promise<unknown> {
 	const savedChat = await ChatModel.findOne({ chatId: String(ctx.chat.id) })
 
 	if (savedChat) {
-		if (savedChat.groups.find((id) => String(id) === String(savedGroup._id))) {
+		if (savedChat.groups.find(id => String(id) === String(savedGroup._id))) {
 			return ctx.reply(`Группа "${savedGroup.name}" уже отслеживается`)
 		}
 
@@ -51,7 +51,7 @@ export async function add(ctx: BotContext): Promise<unknown> {
 			return ctx.reply(`Увы, нельзя отслеживать более ${MAX_TRACKING_GROUPS} групп`)
 		}
 
-		savedChat.groups = [...savedChat.groups, savedGroup._id]
+		savedChat.groups = [...savedChat.groups, String(savedGroup._id)]
 
 		await savedChat.save()
 	} else {

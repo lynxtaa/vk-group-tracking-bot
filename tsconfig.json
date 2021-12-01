@@ -1,6 +1,6 @@
 {
 	"compilerOptions": {
-		"target": "es2018",
+		"target": "es2019",
 		"lib": ["esnext"],
 		"allowJs": false,
 		"skipLibCheck": true,
@@ -9,7 +9,7 @@
 		"strict": true,
 		"forceConsistentCasingInFileNames": true,
 		"noUncheckedIndexedAccess": true,
-		"module": "CommonJS",
+		"module": "ESNext",
 		"moduleResolution": "node",
 		"resolveJsonModule": true,
 		"isolatedModules": true,

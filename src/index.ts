@@ -1,43 +1,26 @@
-import 'dotenv-safe/config'
-
 import mongoose from 'mongoose'
 import ms from 'ms'
 
-import { checkUpdates } from './checkUpdates'
-import { createBot } from './createBot'
+import { checkUpdates } from './checkUpdates.js'
+import { createBot } from './createBot.js'
 
-async function main() {
-	const bot = createBot({
-		token: process.env.BOT_TOKEN,
-		isDev: process.env.NODE_ENV !== 'production',
-	})
+const bot = createBot({
+	token: process.env.BOT_TOKEN,
+	isDev: process.env.NODE_ENV !== 'production',
+})
 
-	await bot.launch()
+await bot.launch()
 
-	await mongoose.connect(process.env.MONGODB_URI, {
-		useCreateIndex: true,
-		useNewUrlParser: true,
-		useUnifiedTopology: true,
-		useFindAndModify: false,
-	})
+await mongoose.connect(process.env.MONGODB_URI)
 
+// eslint-disable-next-line no-console
+console.log('Bot launched...')
+
+function safeCheck() {
 	// eslint-disable-next-line no-console
-	console.log('Bot launched...')
-
-	function safeCheck() {
-		// eslint-disable-next-line no-console
-		checkUpdates(bot).catch(console.error.bind(console))
-	}
-
-	setInterval(safeCheck, ms(process.env.CHECK_INTERVAL || '15m'))
-
-	safeCheck()
+	checkUpdates(bot).catch(console.error.bind(console))
 }
 
-main().catch((err) => {
-	throw err
-})
+setInterval(safeCheck, ms(process.env.CHECK_INTERVAL || '15m'))
 
-process.on('unhandledRejection', (err) => {
-	throw err
-})
+safeCheck()

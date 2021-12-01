@@ -1,7 +1,27 @@
 {
-	"clearMocks": true,
-	"rootDir": "src",
-	"coverageDirectory": "<rootDir>/../coverage",
-	"collectCoverageFrom": ["<rootDir>/**/*.{js,ts}"],
-	"testEnvironment": "node"
+	"roots": ["src"],
+	"resetMocks": true,
+	"coverageDirectory": "./coverage",
+	"collectCoverageFrom": ["./src/**/*.{js,ts}"],
+	"coveragePathIgnorePatterns": ["./src/index.ts"],
+	"testEnvironment": "node",
+	"extensionsToTreatAsEsm": [".ts"],
+	"setupFilesAfterEnv": ["./src/setupTests.ts"],
+	"moduleNameMapper": {
+		"^(\\.{1,2}/.*)\\.js$": "$1"
+	},
+	"transform": {
+		"\\.[jt]sx?$": [
+			"babel-jest",
+			{
+				"babelrc": false,
+				"presets": ["@babel/preset-typescript"],
+				"plugins": [
+					"babel-plugin-transform-typescript-metadata",
+					["@babel/plugin-proposal-decorators", { "legacy": true }],
+					["@babel/plugin-proposal-class-properties", { "loose": true }]
+				]
+			}
+		]
+	}
 }

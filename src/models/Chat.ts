@@ -1,6 +1,8 @@
-import { prop, getModelForClass, Ref } from '@typegoose/typegoose'
+import typegoose, { Ref } from '@typegoose/typegoose'
 
-import { Group } from './Group'
+const { prop, getModelForClass } = typegoose
+
+import { Group } from './Group.js'
 
 class Chat {
 	@prop()

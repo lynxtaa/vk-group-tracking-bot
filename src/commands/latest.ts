@@ -1,6 +1,6 @@
-import { Bot, BotContext } from '../Bot'
-import { getAliasFromURL } from '../utils/getAliasFromURL'
-import { vkClient } from '../vkClient'
+import { Bot, BotContext } from '../Bot.js'
+import { getAliasFromURL } from '../utils/getAliasFromURL.js'
+import { vkClient } from '../vkClient.js'
 
 /** возвращает последний пост указанной группы */
 export function latest(bot: Bot) {
@@ -35,7 +35,7 @@ export function latest(bot: Bot) {
 		})
 
 		const [latestPost] = posts.items.filter(
-			(post) => !post.marked_as_ads && !post.is_pinned,
+			post => !post.marked_as_ads && !post.is_pinned,
 		)
 
 		if (latestPost) {

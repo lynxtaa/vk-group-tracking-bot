@@ -1,13 +1,13 @@
 import { Scenes, Markup } from 'telegraf'
 
-import { BotContext } from '../Bot'
-import { ChatModel } from '../models/Chat'
-import { GroupModel } from '../models/Group'
-import { getUserGroups } from '../utils/getUserGroups'
+import { BotContext } from '../Bot.js'
+import { ChatModel } from '../models/Chat.js'
+import { GroupModel } from '../models/Group.js'
+import { getUserGroups } from '../utils/getUserGroups.js'
 
 export const delGroupScene = new Scenes.BaseScene<BotContext>('delGroupScene')
 
-delGroupScene.enter(async (ctx) => {
+delGroupScene.enter(async ctx => {
 	if (!ctx.chat || !ctx.message) {
 		return ctx.reply('?')
 	}
@@ -22,13 +22,13 @@ delGroupScene.enter(async (ctx) => {
 	return ctx.reply(
 		'Выберите группу, от которой хотите отписаться',
 		Markup.inlineKeyboard(
-			groups.map((group) => Markup.button.callback(group.name, String(group._id))),
+			groups.map(group => Markup.button.callback(group.name, String(group._id))),
 			{ columns: 1 },
 		),
 	)
 })
 
-delGroupScene.action(/.+/, async (ctx) => {
+delGroupScene.action(/.+/, async ctx => {
 	if (!ctx.match || !ctx.chat) {
 		return ctx.reply('?')
 	}
@@ -44,7 +44,7 @@ delGroupScene.action(/.+/, async (ctx) => {
 	}
 
 	const updatedGroups = savedChat.groups.filter(
-		(id) => String(id) !== String(savedGroup._id),
+		id => String(id) !== String(savedGroup._id),
 	)
 
 	if (updatedGroups.length === savedChat.groups.length) {
@@ -58,7 +58,7 @@ delGroupScene.action(/.+/, async (ctx) => {
 
 	await ctx.editMessageText(`Группа "${savedGroup.name}" удалена из списка отслеживаемых`)
 
-	const chatsWithSameGroup = await ChatModel.find({ groups: savedGroup._id })
+	const chatsWithSameGroup = await ChatModel.find({ groups: String(savedGroup._id) })
 
 	if (chatsWithSameGroup.length === 0) {
 		await savedGroup.deleteOne()

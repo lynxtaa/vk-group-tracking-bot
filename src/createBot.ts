@@ -1,9 +1,9 @@
 import { session, Scenes } from 'telegraf'
 
-import { Bot } from './Bot'
-import * as commands from './commands'
-import { delGroupScene } from './scenes/delGroupScene'
-import { wrapInCodeBlock } from './utils/wrapInCodeBlock'
+import { Bot } from './Bot.js'
+import * as commands from './commands/index.js'
+import { delGroupScene } from './scenes/delGroupScene.js'
+import { wrapInCodeBlock } from './utils/wrapInCodeBlock.js'
 
 export function createBot({ token, isDev }: { isDev: boolean; token: string }): Bot {
 	const bot = new Bot(token)
@@ -32,7 +32,7 @@ export function createBot({ token, isDev }: { isDev: boolean; token: string }): 
 
 	bot.command('list', commands.list)
 
-	bot.command('del', (ctx) => ctx.scene.enter(delGroupScene.id))
+	bot.command('del', ctx => ctx.scene.enter(delGroupScene.id))
 
 	bot.hears(/^http(s)?:/, commands.add)
 

@@ -1,4 +1,4 @@
-import { BotContext } from '../Bot'
+import { BotContext } from '../Bot.js'
 
 const helpText = [
 	'Привет! Я бот отслеживания постов в группах Вконтакте.',

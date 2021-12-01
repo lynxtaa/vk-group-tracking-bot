@@ -1,5 +1,5 @@
-import { BotContext } from '../Bot'
-import { vkClient } from '../vkClient'
+import { BotContext } from '../Bot.js'
+import { vkClient } from '../vkClient.js'
 
 /** включение/выключение отладки запросов */
 export function debug(ctx: BotContext): Promise<unknown> {

@@ -1,8 +1,10 @@
-import { isDocumentArray } from '@typegoose/typegoose'
-import { sortBy } from 'lodash'
+import typegoose from '@typegoose/typegoose'
+import sortBy from 'lodash/sortBy.js'
 
-import { ChatModel } from '../models/Chat'
-import { Group } from '../models/Group'
+import { ChatModel } from '../models/Chat.js'
+import { Group } from '../models/Group.js'
+
+const { isDocumentArray } = typegoose
 
 /** Возвращает группы пользователя */
 export async function getUserGroups(chatId: string): Promise<Group[]> {
@@ -12,5 +14,5 @@ export async function getUserGroups(chatId: string): Promise<Group[]> {
 		return []
 	}
 
-	return sortBy(chat.groups, (group) => group.name)
+	return sortBy(chat.groups, group => group.name)
 }

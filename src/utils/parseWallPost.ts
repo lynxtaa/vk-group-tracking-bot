@@ -1,16 +1,17 @@
-import { sortBy, last, truncate } from 'lodash'
+import sortBy from 'lodash/sortBy.js'
+import truncate from 'lodash/truncate.js'
 import { Infer } from 'superstruct'
 import { InputMediaPhoto } from 'telegraf/typings/core/types/typegram'
 
-import { vkClient } from '../vkClient'
+import { vkClient } from '../vkClient.js'
 
-import { formatVKLinks } from './formatVKLinks'
-import { Repost, WallPost } from './structs'
+import { formatVKLinks } from './formatVKLinks.js'
+import { Repost, WallPost } from './structs.js'
 
 const MAX_MESSAGE_LENGTH = 4096
 
 const getBiggestImage = (sizes: { height: number; url: string; width: number }[]) =>
-	last(sortBy(sizes, (size) => size.height * size.width))
+	sortBy(sizes, size => size.height * size.width).at(-1)
 
 type ParsedPost = {
 	/** Audio titles */

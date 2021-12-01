@@ -1,17 +1,7 @@
-import { generatePost } from '../test-utils'
-import { vkClient, VKClient } from '../vkClient'
+import { server, rest } from '../mswServer.js'
+import { generatePost } from '../test-utils/test-utils.js'
 
-import { parseWallPost } from './parseWallPost'
-
-jest.mock('../vkClient', () => ({
-	vkClient: { getGroupById: jest.fn() },
-}))
-
-// eslint-disable-next-line @typescript-eslint/unbound-method
-const mockGetGroupById = vkClient.getGroupById as jest.Mock<
-	ReturnType<VKClient['getGroupById']>,
-	Parameters<VKClient['getGroupById']>
->
+import { parseWallPost } from './parseWallPost.js'
 
 it('returns parsed post', async () => {
 	const post = generatePost({
@@ -260,14 +250,20 @@ it('parses attached audios', async () => {
 })
 
 it('parses repost', async () => {
+	server.use(
+		rest.get('https://api.vk.com/method/groups.getById*', (req, res, ctx) =>
+			res(
+				ctx.json({
+					response: [{ id: 222, name: 'Какая-то группа', screen_name: 'group_alias' }],
+				}),
+			),
+		),
+	)
+
 	const post = generatePost({
 		text: `Зацените эту группу!`,
 		copy_history: [generatePost({ owner_id: 222, text: 'Всем привет!' })],
 	})
-
-	mockGetGroupById.mockResolvedValue([
-		{ id: 222, name: 'Какая-то группа', screen_name: 'group_alias' },
-	])
 
 	const parsedPost = await parseWallPost('Город', post)
 

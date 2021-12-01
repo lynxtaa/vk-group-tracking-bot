@@ -1,4 +1,4 @@
-import { formatVKLinks } from './formatVKLinks'
+import { formatVKLinks } from './formatVKLinks.js'
 
 it('do nothing for regular text', () => {
 	const text = 'Hello'

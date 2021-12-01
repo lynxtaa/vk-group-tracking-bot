@@ -1,4 +1,4 @@
-import { zip } from 'lodash'
+import zip from 'lodash/zip.js'
 import ms from 'ms'
 import PQueue from 'p-queue'
 import QuickLRU from 'quick-lru'
@@ -7,8 +7,8 @@ import { Telegraf, Scenes } from 'telegraf'
 import { InputMediaPhoto, Message } from 'telegraf/typings/core/types/typegram'
 import { ExtraMediaGroup } from 'telegraf/typings/telegram-types'
 
-import { parseWallPost } from './utils/parseWallPost'
-import { WallPost } from './utils/structs'
+import { parseWallPost } from './utils/parseWallPost.js'
+import { WallPost } from './utils/structs.js'
 
 export type BotContext = Scenes.SceneContext
 
@@ -16,7 +16,7 @@ export class Bot extends Telegraf<BotContext> {
 	fileCache: QuickLRU<string, string>
 	queue: PQueue
 
-	constructor(token: string, options?: Telegraf['options']) {
+	constructor(token: string, options?: Telegraf.Options<BotContext>) {
 		super(token, options)
 
 		this.fileCache = new QuickLRU<string, string>({ maxSize: 1000 })
@@ -33,7 +33,7 @@ export class Bot extends Telegraf<BotContext> {
 	): Promise<Message[]> {
 		const messages = await this.telegram.sendMediaGroup(
 			chatId,
-			media.map((file) => {
+			media.map(file => {
 				const fileId = this.fileCache.get(file.media)
 				return fileId ? { ...file, media: fileId } : file
 			}),

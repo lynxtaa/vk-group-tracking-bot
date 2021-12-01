@@ -20,11 +20,13 @@
 	"rules": {
 		"no-mixed-spaces-and-tabs": "off",
 		"no-console": "warn",
+		"import/extensions": ["error", "ignorePackages"],
 		"import/order": [
 			"warn",
 			{ "alphabetize": { "order": "asc" }, "newlines-between": "always" }
 		],
 		"import/newline-after-import": "warn",
+		"import/no-unresolved": "off",
 		"@typescript-eslint/no-explicit-any": "off",
 		"@typescript-eslint/prefer-optional-chain": "warn",
 		"@typescript-eslint/explicit-module-boundary-types": [

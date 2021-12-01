@@ -1,9 +1,9 @@
-import { groupBy } from 'lodash'
+import groupBy from 'lodash/groupBy.js'
 
-import { Bot } from './Bot'
-import { ChatModel } from './models/Chat'
-import { GroupModel } from './models/Group'
-import { getNewPosts } from './utils/getNewPosts'
+import { Bot } from './Bot.js'
+import { ChatModel } from './models/Chat.js'
+import { GroupModel } from './models/Group.js'
+import { getNewPosts } from './utils/getNewPosts.js'
 
 const MAX_FAILED_SENDS = 100
 
@@ -14,14 +14,14 @@ export async function checkUpdates(bot: Bot): Promise<void> {
 	})
 
 	const byGroupId = groupBy(
-		chatsToCheck.flatMap((chat) => chat.groups.map((groupId) => ({ chat, groupId }))),
-		(el) => el.groupId,
+		chatsToCheck.flatMap(chat => chat.groups.map(groupId => ({ chat, groupId }))),
+		el => el.groupId,
 	)
 
 	const groups = await GroupModel.find().where('_id').in(Object.keys(byGroupId))
 
 	const checkResults = await Promise.allSettled(
-		groups.map(async (group) => {
+		groups.map(async group => {
 			const newPosts = await getNewPosts(group)
 
 			if (newPosts[0]) {

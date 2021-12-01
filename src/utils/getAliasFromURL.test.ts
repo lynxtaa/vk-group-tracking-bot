@@ -1,4 +1,4 @@
-import { getAliasFromURL } from './getAliasFromURL'
+import { getAliasFromURL } from './getAliasFromURL.js'
 
 it('returns path from url', () => {
 	expect(getAliasFromURL('http://vk.com/club11233')).toBe('club11233')

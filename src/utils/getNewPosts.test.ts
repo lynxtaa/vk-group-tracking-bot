@@ -1,18 +1,8 @@
-import { Group } from '../models/Group'
-import { generatePost } from '../test-utils'
-import { vkClient, VKClient } from '../vkClient'
+import { Group } from '../models/Group.js'
+import { server, rest } from '../mswServer.js'
+import { generatePost } from '../test-utils/test-utils.js'
 
-import { getNewPosts } from './getNewPosts'
-
-jest.mock('../vkClient', () => ({
-	vkClient: { getWall: jest.fn() },
-}))
-
-// eslint-disable-next-line @typescript-eslint/unbound-method
-const mockGetWall = vkClient.getWall as jest.Mock<
-	ReturnType<VKClient['getWall']>,
-	Parameters<VKClient['getWall']>
->
+import { getNewPosts } from './getNewPosts.js'
 
 it('returns latest non-ad post if no last post saved', async () => {
 	const posts = [
@@ -21,10 +11,15 @@ it('returns latest non-ad post if no last post saved', async () => {
 		generatePost({ id: 9, marked_as_ads: 0 }),
 	]
 
-	mockGetWall.mockResolvedValue({
-		count: posts.length,
-		items: posts,
-	})
+	server.use(
+		rest.get('https://api.vk.com/method/wall.get*', (req, res, ctx) =>
+			res(
+				ctx.json({
+					response: { count: posts.length, items: posts },
+				}),
+			),
+		),
+	)
 
 	const newPosts = await getNewPosts({
 		ownerID: 10,
@@ -34,13 +29,6 @@ it('returns latest non-ad post if no last post saved', async () => {
 	} as Group)
 
 	expect(newPosts).toEqual([posts[1]])
-	expect(mockGetWall).toHaveBeenCalledWith({
-		owner_id: 10,
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-		count: expect.any(Number),
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-		offset: expect.any(Number),
-	})
 })
 
 it('returns no posts if latest post is already saved', async () => {
@@ -50,7 +38,15 @@ it('returns no posts if latest post is already saved', async () => {
 		generatePost({ id: 9, marked_as_ads: 0 }),
 	]
 
-	mockGetWall.mockResolvedValue({ count: posts.length, items: posts })
+	server.use(
+		rest.get('https://api.vk.com/method/wall.get*', (req, res, ctx) =>
+			res(
+				ctx.json({
+					response: { count: posts.length, items: posts },
+				}),
+			),
+		),
+	)
 
 	const newPosts = await getNewPosts({
 		ownerID: 10,
@@ -72,7 +68,15 @@ it('returns new posts after saved post', async () => {
 		generatePost({ id: 7, marked_as_ads: 0 }),
 	]
 
-	mockGetWall.mockResolvedValue({ count: posts.length, items: posts })
+	server.use(
+		rest.get('https://api.vk.com/method/wall.get*', (req, res, ctx) =>
+			res(
+				ctx.json({
+					response: { count: posts.length, items: posts },
+				}),
+			),
+		),
+	)
 
 	const newPosts = await getNewPosts({
 		ownerID: 10,
@@ -86,7 +90,15 @@ it('returns new posts after saved post', async () => {
 })
 
 it('returns no posts if no posts in group', async () => {
-	mockGetWall.mockResolvedValue({ count: 0, items: [] })
+	server.use(
+		rest.get('https://api.vk.com/method/wall.get*', (req, res, ctx) =>
+			res(
+				ctx.json({
+					response: { count: 0, items: [] },
+				}),
+			),
+		),
+	)
 
 	const newPosts = await getNewPosts({
 		ownerID: 10,

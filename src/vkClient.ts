@@ -1,11 +1,11 @@
 import { URLSearchParams } from 'url'
 
+import got from 'got'
 import ms from 'ms'
-import fetch from 'node-fetch'
 import PQueue from 'p-queue'
 import { assert, array, number, type, string, Infer, optional } from 'superstruct'
 
-import { WallPost } from './utils/structs'
+import { WallPost } from './utils/structs.js'
 
 const GroupInfos = array(
 	type({
@@ -50,28 +50,24 @@ export class VKClient {
 		searchParams.append('access_token', this.token)
 		searchParams.append('v', String(this.apiVersion))
 
-		const response = await this.queue.add(() =>
-			fetch(`https://api.vk.com/method/${name}?${searchParams}`),
+		const json = await this.queue.add(() =>
+			got(`https://api.vk.com/method/${name}`, { searchParams, timeout: 10_000 }).json(),
 		)
 
-		if (!response.ok) {
-			throw new Error(`Request failed: ${response.url}: ${response.status}`)
-		}
-
-		const json = (await response.json()) as
+		const data = json as
 			| { error: { error_msg: string } }
 			| { response: Record<string, unknown> | unknown[] }
 
 		if (this.debug) {
 			// eslint-disable-next-line no-console
-			console.log(JSON.stringify(json, null, '  '))
+			console.log(JSON.stringify(data, null, '  '))
 		}
 
-		if ('error' in json) {
-			throw new Error(`Request failed: ${response.url}: ${json.error.error_msg}`)
+		if ('error' in data) {
+			throw new Error(`Request failed for API method: ${name}: ${data.error.error_msg}`)
 		}
 
-		return json.response
+		return data.response
 	}
 
 	toggleDebug(): boolean {

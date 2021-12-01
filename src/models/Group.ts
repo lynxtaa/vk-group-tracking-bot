@@ -1,4 +1,6 @@
-import { prop, getModelForClass, defaultClasses } from '@typegoose/typegoose'
+import typegoose from '@typegoose/typegoose'
+
+const { prop, getModelForClass } = typegoose
 
 class LastPost {
 	@prop()
@@ -11,7 +13,9 @@ class LastPost {
 	createdAt!: Date
 }
 
-export class Group extends defaultClasses.Base {
+export class Group {
+	_id?: string
+
 	@prop()
 	ownerID!: number
 
